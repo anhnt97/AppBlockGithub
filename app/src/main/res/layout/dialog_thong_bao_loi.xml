@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="256dp"
+    android:layout_height="wrap_content"
+    android:background="@drawable/frame_rectangle_not_rounded"
+    android:orientation="vertical">
+
+    <TextView
+        style="@style/TextValue"
+        android:layout_margin="1dp"
+        android:background="#42a0ff"
+        android:layout_width="match_parent"
+        android:layout_height="36dp"
+        android:paddingTop="4dp"
+        android:paddingLeft="18dp"
+        android:text="Thông Báo"
+        android:textSize="21sp"
+        android:id="@+id/textView" />
+
+    <TextView
+        android:id="@+id/txt_message_thong_bao"
+        style="@style/TextValue"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingBottom="12dp"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/textView"
+        android:paddingLeft="20dp"
+        android:paddingRight="20dp"
+        android:paddingTop="12dp"
+        android:text="Xin vui lòng kiểm tra lại thiết lập giới hạn!"
+        android:textSize="18sp" />
+
+    <TextView
+        android:id="@+id/btn_ok_thong_bao"
+        style="@style/TextValue"
+        android:layout_width="70dp"
+        android:layout_height="30dp"
+        android:layout_alignParentEnd="true"
+        android:layout_marginRight="1dp"
+        android:layout_marginBottom="1dp"
+        android:layout_below="@+id/txt_message_thong_bao"
+        android:background="#63b0fd"
+        android:gravity="center"
+        android:text="Ok"
+        android:textSize="20sp" />
+</RelativeLayout>

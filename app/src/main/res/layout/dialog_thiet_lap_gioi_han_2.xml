@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:background="@drawable/frame_rectangle_not_rounded"
+    android:orientation="vertical">
+
+    <RelativeLayout
+        android:layout_width="250dp"
+        android:layout_height="40dp"
+        android:background="@drawable/frame_title_dailog">
+
+        <TextView
+            style="@style/TextValue"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_gravity="center"
+            android:layout_marginLeft="16dp"
+            android:text="Thiết lập giới hạn"
+            android:textSize="21sp" />
+
+        <ImageView
+            android:id="@+id/img_icon_app_in_thiet_lap_2"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:layout_gravity="center_vertical"
+            android:layout_marginRight="4dp"
+            android:background="@drawable/icon_facebook" />
+    </RelativeLayout>
+
+    <LinearLayout
+        android:layout_marginLeft="1dp"
+        android:layout_marginRight="1dp"
+        android:paddingBottom="12dp"
+        android:background="#b2d8ff"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingLeft="16dp">
+
+        <TextView
+            style="@style/TextValue"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="Chọn cấp độ giới hạn!"
+            android:textSize="20sp"
+            android:textStyle="italic" />
+
+        <RadioGroup
+            android:layout_marginTop="8dp"
+            android:layout_width="216dp"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:background="@drawable/frame_rectangle_not_rounded"
+            android:padding="2dp">
+            <LinearLayout
+                android:paddingLeft="4dp"
+                android:paddingTop="4dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:background="#a7ff84"
+                >
+                <RadioButton
+                    android:id="@+id/btn_chon_level_nhe"
+                    style="@style/TextValue"
+                    android:textSize="20sp"
+                    android:text="Nhẹ"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+
+                <TextView
+                    style="@style/TextValue"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingLeft="28dp"
+                    android:textStyle="italic"
+                    android:text="(Bạn sẽ được nhắc nhở khi vượt quá giới hạn)"
+                    android:paddingBottom="8dp"
+                    android:textSize="12sp" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:paddingLeft="4dp"
+                android:paddingTop="4dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:background="#fffb87"
+                >
+                <RadioButton
+                    android:id="@+id/btn_chon_level_binh_thuong"
+                    style="@style/TextValue"
+                    android:textSize="20sp"
+                    android:text="Bình Thường"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+
+                <TextView
+                    style="@style/TextValue"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingLeft="28dp"
+                    android:textStyle="italic"
+                    android:text="(Bạn sẽ phải thực hiện một số thử thách để tiếp tục sử dụng khi đã vượt quá giới hạn)"
+                    android:textSize="12sp"
+                    android:paddingBottom="8dp"
+                    />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:paddingLeft="4dp"
+                android:paddingTop="4dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:background="#ff645c"
+                >
+                <RadioButton
+                    android:id="@+id/btn_chon_level_cuong_quyet"
+                    style="@style/TextValue"
+                    android:textSize="20sp"
+                    android:text="Cương Quyết"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+
+                <TextView
+                    style="@style/TextValue"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingLeft="28dp"
+                    android:textStyle="italic"
+                    android:text="(Bạn sẽ không thể tiếp tục sử dụng ứng dụng khi đã  vượt quá giới hạn)"
+                    android:paddingBottom="8dp"
+                    android:textSize="12sp" />
+
+            </LinearLayout>
+        </RadioGroup>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="36dp"
+        android:background="#63b0fd"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/btn_tro_ve_thiet_lap_2"
+            style="@style/TextValue"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="@drawable/frame_rectangle_not_rounded"
+            android:gravity="center"
+            android:text="Trở về"
+            android:textSize="20sp" />
+
+        <TextView
+            android:id="@+id/btn_tao_thiet_lap_2"
+            style="@style/TextValue"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="@drawable/frame_rectangle_not_rounded"
+            android:gravity="center"
+            android:text="Tạo"
+            android:textSize="20sp" />
+    </LinearLayout>
+
+
+</LinearLayout>

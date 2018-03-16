@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="256dp"
+    android:layout_height="wrap_content"
+    android:background="@drawable/frame_rectangle_not_rounded"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="34dp"
+        android:background="@drawable/frame_title_dailog">
+
+        <TextView
+            style="@style/TextValue"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginLeft="16dp"
+            android:text="Lựa chọn"
+            android:textSize="21sp" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <RadioGroup
+            android:layout_marginLeft="1dp"
+            android:layout_marginRight="1dp"
+            android:background="#b2d8ff"
+            android:id="@+id/radioGroup_lua_chon"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <RadioButton
+                android:id="@+id/radioBtn_gioi_han"
+                style="@style/TextValue"
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:layout_marginLeft="16dp"
+                android:paddingLeft="16dp"
+                android:text="Giới Hạn"
+                android:textSize="18sp" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="#000000"></LinearLayout>
+
+            <RadioButton
+                android:id="@+id/radioBtn_cai_nghien"
+                style="@style/TextValue"
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:layout_marginLeft="16dp"
+                android:paddingLeft="16dp"
+                android:text="Cai nghiện"
+                android:textSize="18sp" />
+
+        </RadioGroup>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="34dp"
+        android:background="#63b0fd"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/btn_tro_ve_lua_chon"
+            style="@style/TextValue"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="@drawable/frame_rectangle_not_rounded"
+            android:gravity="center"
+            android:text="Trở về"
+            android:textSize="20sp" />
+
+        <TextView
+            android:id="@+id/btn_tiep_lua_chon"
+            style="@style/TextValue"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="@drawable/frame_rectangle_not_rounded"
+            android:gravity="center"
+            android:text="Tiếp"
+            android:textSize="20sp" />
+    </LinearLayout>
+
+</LinearLayout>
