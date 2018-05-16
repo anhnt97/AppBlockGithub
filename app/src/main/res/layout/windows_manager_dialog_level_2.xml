@@ -1,141 +1,191 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
+    android:id="@+id/layout_wd_manager_2"
     android:layout_height="match_parent"
-    android:background="#bfffffff"
-    android:gravity="center"
-    android:orientation="vertical">
+    >
 
     <LinearLayout
-        android:layout_width="300dp"
-        android:layout_height="wrap_content"
-        android:background="@drawable/frame_rectangle_not_rounded"
-        android:gravity="center"
-        android:orientation="vertical">
+        android:id="@+id/rlt_layout_about_in_wdmanager_2"
+        android:layout_width="match_parent"
+        android:layout_height="38dp"
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="16dp"
+        android:layout_marginTop="8dp"
+        android:background="#87e8efef">
 
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="40dp"
-            android:background="@drawable/frame_title_dailog">
+        <ImageView
+            android:id="@+id/img_icon_app_in_wdmanager_2"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_gravity="center_vertical"
+            android:layout_marginLeft="4dp"
+            />
 
-            <TextView
-                style="@style/TextValue"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerVertical="true"
-                android:layout_gravity="center"
-                android:layout_marginLeft="16dp"
-                android:text="Giới hạn"
-                android:textSize="21sp" />
-
-            <!--<ImageView-->
-                <!--android:id="@+id/img_icon_thong_bao_gioi_han"-->
-                <!--android:layout_width="30dp"-->
-                <!--android:layout_height="30dp"-->
-                <!--android:layout_alignParentEnd="true"-->
-                <!--android:layout_centerVertical="true"-->
-                <!--android:layout_gravity="center_vertical"-->
-                <!--android:layout_marginRight="8dp"-->
-                <!--android:background="@drawable/icon_facebook" />-->
-        </RelativeLayout>
-
-        <RelativeLayout
-            android:layout_marginLeft="1dp"
-            android:layout_marginRight="1dp"
-            android:layout_width="match_parent"
-            android:layout_height="290dp"
-            android:background="#c2e0ff"
-            android:orientation="vertical"
-            android:paddingLeft="24dp"
-            android:paddingRight="24dp"
-            android:paddingTop="14dp">
-
-            <TextView
-                android:id="@+id/textView3"
-                style="@style/TextValue"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Xin vui lòng nhập lại đoạn mã dưới đây để tiếp tục sử dụng ứng dụng."
-                android:textSize="18sp" />
-
-            <TextView
-                android:id="@+id/textView4"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@+id/textView3"
-                android:layout_centerHorizontal="true"
-                android:layout_gravity="center"
-                android:layout_marginTop="2dp"
-                android:text="(Lưu ý có phân biệt chữ hoa, chữ thường)"
-                android:textColor="#ff0004"
-                android:textSize="14sp"
-                android:textStyle="italic" />
-
-            <TextView
-                android:id="@+id/txt_system_value"
-                style="@style/TextValue"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_above="@+id/edt_person_value"
-                android:layout_alignStart="@+id/edt_person_value"
-                android:layout_marginBottom="8dp"
-                android:background="@drawable/frame_dailog_isrounded_corners"
-                android:paddingBottom="2dp"
-                android:paddingLeft="10dp"
-                android:paddingRight="10dp"
-                android:paddingTop="2dp"
-                android:text="QHDTNFfkxurg12579GRSCRABHTDHTD"
-                android:textColor="#002dc2"
-                android:textSize="18dp"
-                android:textStyle="bold|italic" />
-
-            <EditText
-                android:id="@+id/edt_person_value"
-                style="@style/TextValue"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_alignParentBottom="true"
-                android:layout_alignStart="@+id/textView4"
-                android:layout_marginBottom="9dp"
-                android:background="@drawable/frame_rectangle_not_rounded"
-                android:paddingBottom="2dp"
-                android:paddingLeft="8dp"
-                android:paddingRight="8dp"
-                android:paddingTop="2dp"
-                android:text="QHDTNFfkxurg12579GRSCRABHTDHTD"
-                android:textSize="20dp"
-                android:textStyle="italic|bold" />
-        </RelativeLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="36dp"
-            android:background="#63b0fd"
-            android:orientation="horizontal">
-
-            <TextView
-                android:id="@+id/btn_thoat_thong_bao_gioi_han_2"
-                style="@style/TextValue"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:background="@drawable/frame_rectangle_not_rounded"
-                android:gravity="center"
-                android:text="Thoát"
-                android:textSize="20sp" />
-
-            <TextView
-                android:id="@+id/btn_ok_thong_bao_gioi_han_2"
-                style="@style/TextValue"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:background="@drawable/frame_rectangle_not_rounded"
-                android:gravity="center"
-                android:text="Ok"
-                android:textSize="20sp" />
-        </LinearLayout>
-
+        <TextView
+            android:id="@+id/textView2"
+            style="@style/TextValue"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_marginStart="16dp"
+            android:text="Thông báo giới hạn"
+            android:textColor="#163491"
+            android:textSize="23sp" />
     </LinearLayout>
 
-</LinearLayout>
+    <LinearLayout
+        android:id="@+id/rlt_layout_messenger_in_wdmanager_2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/rlt_layout_about_in_wdmanager_2"
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="16dp"
+        android:layout_marginTop="8dp"
+        android:background="#87e8efef"
+        android:orientation="vertical">
+
+        <TextView
+            style="@style/TextValue"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="8dp"
+            android:layout_marginRight="8dp"
+            android:layout_marginTop="6dp"
+            android:text="Bạn đã sử dụng ứng dụng vượt quá thiết lập giới hạn.
+Vui lòng nhập lại đoạn mã sau để tiếp tục sử dụng ứng dụng?"
+            android:textColor="#000000"
+            android:textSize="20sp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginBottom="8dp"
+            android:text="Lưu ý có phân biệt chữ hoa chữ thường !"
+            android:textColor="#ff1e35" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/rlt_layout_messenger_in_wdmanager_2"
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="16dp"
+        android:layout_marginTop="8dp"
+        android:background="#87e8efef"
+        android:orientation="vertical"
+        android:padding="8dp">
+
+        <TextView
+            android:id="@+id/txt_system_value"
+            style="@style/TextValue"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:background="@drawable/btn_in_window_manager"
+            android:paddingBottom="2dp"
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp"
+            android:paddingTop="2dp"
+            android:text="QHDTNFfkxurg12579GBgTDHTD"
+            android:textColor="#163491"
+            android:textSize="19dp"
+            android:textStyle="bold|italic" />
+
+        <EditText
+            android:id="@+id/edt_person_value"
+            style="@style/TextValue"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/btn_in_window_manager"
+            android:paddingBottom="2dp"
+            android:paddingLeft="8dp"
+            android:paddingRight="8dp"
+            android:paddingTop="2dp"
+            android:text=""
+            android:textColor="#163491"
+            android:textSize="19dp"
+            android:textStyle="italic|bold" />
+    </LinearLayout>
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@id/rlt_layout_btn_wdmanager_1"
+        android:layout_marginBottom="12dp"
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="16dp"
+        android:background="#87e8efef"
+        android:orientation="vertical"
+        android:padding="8dp">
+
+        <TextView
+            android:id="@+id/txt_locution_value_wdm2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="10dp"
+            android:gravity="center"
+            android:text="Hoặc bạn đuổi theo thời gian hoặc thời gian sẽ đuổi theo bạn."
+            android:textColor="#163491"
+            android:textSize="20sp"
+            android:textStyle="italic" />
+
+        <TextView
+            android:id="@+id/txt_author_locution_wdm2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_gravity="right"
+            android:layout_marginRight="4dp"
+            android:layout_marginTop="4dp"
+            android:text="Jim Rhon"
+            android:textColor="#02248f"
+            android:textSize="18sp"
+            android:textStyle="italic|bold" />
+    </LinearLayout>
+
+
+    <LinearLayout
+        android:id="@+id/rlt_layout_btn_wdmanager_1"
+        android:layout_width="match_parent"
+        android:layout_height="30dp"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="12dp"
+        android:layout_marginLeft="28dp"
+        android:layout_marginRight="28dp"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/btn_thoat_thong_bao_gioi_han_2"
+            style="@style/TextValue"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="4"
+            android:background="@drawable/btn_in_window_manager"
+            android:gravity="center"
+            android:text="Thoát"
+            android:textColor="#163491"
+            android:textSize="20sp" />
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="3" />
+
+        <TextView
+            android:id="@+id/btn_ok_thong_bao_gioi_han_2"
+            style="@style/TextValue"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="4"
+            android:background="@drawable/btn_in_window_manager"
+            android:gravity="center"
+            android:text="Ok"
+            android:textColor="#163491"
+            android:textSize="20sp" />
+    </LinearLayout>
+
+</RelativeLayout>

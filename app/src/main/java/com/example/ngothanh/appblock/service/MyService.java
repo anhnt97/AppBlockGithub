@@ -1,36 +1,54 @@
 package com.example.ngothanh.appblock.service;
 
+import android.app.Activity;
 import android.app.ActivityManager;
+import android.app.Dialog;
 import android.app.Service;
+import android.app.usage.UsageEvents;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.PixelFormat;
+import android.inputmethodservice.Keyboard;
 import android.os.Binder;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Looper;
 import android.os.PowerManager;
+import android.support.v7.app.AlertDialog;
+import android.text.Editable;
+import android.text.method.KeyListener;
+import android.util.EventLog;
+import android.util.EventLog.Event;
 import android.util.Log;
-import android.view.Gravity;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.Window;
 import android.view.WindowManager;
 import android.widget.EditText;
+import android.widget.FrameLayout;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.ngothanh.appblock.sqlite.Locution;
+import com.example.ngothanh.appblock.view.Broadcast;
 import com.example.ngothanh.appblock.view.NotifyLimitedView;
 import com.example.ngothanh.appblock.R;
 import com.example.ngothanh.appblock.sqlite.AppLimited;
 import com.example.ngothanh.appblock.sqlite.DatabaseLimited;
+import com.example.ngothanh.appblock.view.demo;
 
+import java.security.KeyStore;
 import java.util.ArrayList;
 import java.util.ConcurrentModificationException;
+import java.util.EventListener;
 import java.util.List;
 import java.util.Random;
 
-public class MyService extends Service {
+public class MyService extends Service implements View.OnTouchListener {
     private static final String TAG = "MyService";
     private final IBinder myBinder = new LocalBinder();
     private ArrayList<AppLimited> appLimiteds;
@@ -42,7 +60,8 @@ public class MyService extends Service {
     private long timeNow;
     private long isLimited = 0;
     private long timeOnRun = 0;
-
+    private String tempRememberPackageName[] = new String[2];
+    private boolean countOpen = false;
 
     private WindowManager windowManager;
     private WindowManager.LayoutParams params;
@@ -51,6 +70,8 @@ public class MyService extends Service {
 
     @Override
     public void onCreate() {
+        tempRememberPackageName[0] = "";
+        tempRememberPackageName[1] = "";
         super.onCreate();
     }
 
@@ -62,7 +83,8 @@ public class MyService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         windowManager = (WindowManager) getSystemService(WINDOW_SERVICE);
-//        Toast.makeText(this, "Chạy service", Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, "Chạy service", Toast.LENGTH_SHORT).show();
+        Log.d(TAG, "run Sẻvice");
         runCheckLimitApp();
         return START_STICKY;
     }
@@ -72,11 +94,8 @@ public class MyService extends Service {
         super.onDestroy();
     }
 
-    public class LocalBinder extends Binder {
-        MyService getService() {
 
-            return MyService.this;
-        }
+    public class LocalBinder extends Binder {
     }
 
     public void runCheckLimitApp() {
@@ -84,15 +103,10 @@ public class MyService extends Service {
         Thread thread = new Thread() {
             @Override
             public void run() {
-                try {
-                    while (true) {
-                        timeNow = System.currentTimeMillis();
-                        updateListDatabase();
-                        sleep(2000);
-                        handlingService(context);
-                    }
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
+                while (true) {
+                    timeNow = System.currentTimeMillis();
+                    updateListDatabase();
+                    handlingService(context);
                 }
             }
         };
@@ -101,18 +115,24 @@ public class MyService extends Service {
 
     public void handlingService(final Context ctx) {
         ActivityManager manager = (ActivityManager) ctx.getSystemService(ACTIVITY_SERVICE);
+        String temp = "";
+//        if (Build.VERSION.SDK_INT >= 21) {
+//
+//
+//        } else {
+        assert manager != null;
         List<ActivityManager.RunningTaskInfo> runningTaskInfo = manager.getRunningTasks(1);
-
-
         ComponentName componentInfo = runningTaskInfo.get(0).topActivity;
-        String temp = componentInfo.getPackageName();
-
+        temp = componentInfo.getPackageName();
+//        }
+        Log.d(TAG, "package Name: " + temp);
         PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
         boolean isScreenOn = pm.isScreenOn();
 
         //nho gia tri cua package trong lan mo dau tien
         if (!isOpen) {
             rememberPackageName = temp;
+            tempRememberPackageName[0] = temp;
         }
         if (!rememberPackageName.equals(temp)) {
             if (appIsRunning.isTypeIsCountOpen() == 0) {
@@ -121,6 +141,15 @@ public class MyService extends Service {
                 databaseLimited.updateToLimitedDatabase(appIsRunning);
                 timeOnRun = 0;
             }
+//            if (!tempRememberPackageName[1].equals(temp)) {
+////                countOpen = true;
+////            } else {
+////                countOpen = false;
+////            }
+////            tempRememberPackageName[1] = tempRememberPackageName[1];
+////            tempRememberPackageName[0] = temp;
+
+
             isLimited = 0;
             isOpen = false;
             appIsRunning = null;
@@ -137,12 +166,12 @@ public class MyService extends Service {
                 if (appIsRunning != null) {
                     if (appIsRunning.isTypeIsCountOpen() == 1) {
                         //check con so lan gioi han va chua tung mo
-                        if (appIsRunning.getCountDown() >=0) {
-                            if (!isOpen) {
+                        if (appIsRunning.getCountDown() >= 0) {
+                            if (!isOpen || countOpen) {
                                 appIsRunning.setCountDown(appIsRunning.getCountDown() - 1);
                                 databaseLimited.updateToLimitedDatabase(appIsRunning);
                                 isOpen = true;
-                                if (appIsRunning.getCountDown() != 0) {
+                                if (appIsRunning.getCountDown() > 0) {
                                     toastMessenger(ctx, "Bạn còn " + appIsRunning.getCountDown() + " lần mở ứng dụng");
                                 } else {
                                     toastMessenger(ctx, "Đây là lần sử dụng ứng dụng cuối cùng");
@@ -169,7 +198,7 @@ public class MyService extends Service {
                                     break;
                                 case 2:
                                     if (isLimited == 0) {
-                                        showNotifyDialogLimited2();
+                                        showNotifyDialogLimited2(ctx);
                                         isLimited = System.currentTimeMillis();
                                     }
 
@@ -207,7 +236,7 @@ public class MyService extends Service {
                                 int time = appIsRunning.getCountDown() - (int) timeMinus;
                                 if (time < 5 * 60 * 1000) {
                                     if (timeMinus % (1 * 60 * 1000) == 0) {
-                                        Log.d(TAG, "handlingService: "+timeMinus);
+                                        Log.d(TAG, "handlingService: " + timeMinus);
                                         time /= 1000;
                                         time /= 60;
                                         int h = time / 60;
@@ -252,14 +281,14 @@ public class MyService extends Service {
                                         isLimited = System.currentTimeMillis();
                                     }
 
-                                    if (System.currentTimeMillis() - isLimited >= (1 * 60 * 1000)) {
+                                    if (System.currentTimeMillis() - isLimited >= (5 * 60 * 1000)) {
                                         showNotifyDialogLimited1();
                                         isLimited = System.currentTimeMillis();
                                     }
                                     break;
                                 case 2:
                                     if (isLimited == 0) {
-                                        showNotifyDialogLimited2();
+                                        showNotifyDialogLimited2(ctx);
                                         isLimited = System.currentTimeMillis();
                                     }
 
@@ -279,6 +308,7 @@ public class MyService extends Service {
                 isOpen = false;
             }
         }
+
     }
 
 
@@ -335,45 +365,101 @@ public class MyService extends Service {
             @Override
             public void run() {
                 notifyLimitedView = new NotifyLimitedView(MyService.this);
+                notifyLimitedView.setFocusableInTouchMode(true);
+                notifyLimitedView.requestFocus();
+                notifyLimitedView.setActivated(true);
+                notifyLimitedView.setClickable(true);
                 LayoutInflater inflater = LayoutInflater.from(MyService.this);
                 inflater.inflate(R.layout.window_manager_dialog_level_1, notifyLimitedView);
                 setupNotifyDialogView1();
 
-                params = new WindowManager.LayoutParams();
-                params.width = WindowManager.LayoutParams.WRAP_CONTENT;
-                params.height = WindowManager.LayoutParams.WRAP_CONTENT;
-                params.gravity = Gravity.CENTER;
-                params.type = WindowManager.LayoutParams.TYPE_PHONE;
+                params = new WindowManager.LayoutParams(
+                        WindowManager.LayoutParams.MATCH_PARENT,
+                        WindowManager.LayoutParams.MATCH_PARENT,
+                        WindowManager.LayoutParams.TYPE_PRIORITY_PHONE,
+                        WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL |
+                                WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH,
+                        PixelFormat.TRANSLUCENT);
+                params.width = WindowManager.LayoutParams.MATCH_PARENT;
+                params.height = WindowManager.LayoutParams.MATCH_PARENT;
+                Thread thread = new Thread() {
+                    @Override
+                    public void run() {
+                        while (true) {
+//                            Log.d("notifyLimitView", "run: thread");
+                            if (notifyLimitedView.isPressButtonBack || notifyLimitedView.isPressButtonHome) {
+//                                killApp();
+                                return;
+                            }
+                        }
+                    }
+                };
+                thread.start();
                 windowManager.addView(notifyLimitedView, params);
             }
         });
+
     }
 
-    private void showNotifyDialogLimited2() {
-        final Handler handler = new Handler(Looper.getMainLooper());
-        handler.post(new Runnable() {
-            @Override
-            public void run() {
-                notifyLimitedView = new NotifyLimitedView(MyService.this);
-                LayoutInflater minflater = LayoutInflater.from(MyService.this);
-                minflater.inflate(R.layout.windows_manager_dialog_level_2, notifyLimitedView);
-                setupNotifyDialogView2();
+    private void showNotifyDialogLimited2(Context context) {
 
-                params = new WindowManager.LayoutParams();
-                params.width = WindowManager.LayoutParams.WRAP_CONTENT;
-                params.height = WindowManager.LayoutParams.WRAP_CONTENT;
-                params.gravity = Gravity.CENTER;
-                params.type = WindowManager.LayoutParams.TYPE_PHONE;
-                windowManager.addView(notifyLimitedView, params);
-            }
-        });
+//        Dialog dialog= new Dialog(context);
+//        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+//        dialog.setContentView(R.layout.windows_manager_dialog_level_2);
+//        dialog.show();
+//        final Handler handler = new Handler(Looper.getMainLooper());
+//        handler.post(new Runnable() {
+//            @Override
+//            public void run() {
+//                notifyLimitedView = new NotifyLimitedView(MyService.this);
+//                LayoutInflater minflater = LayoutInflater.from(MyService.this);
+//                minflater.inflate(R.layout.windows_manager_dialog_level_2, notifyLimitedView);
+//                setupNotifyDialogView2();
+//
+//                params = new WindowManager.LayoutParams(
+//                        WindowManager.LayoutParams.MATCH_PARENT,
+//                        WindowManager.LayoutParams.MATCH_PARENT,
+//                        WindowManager.LayoutParams.TYPE_PHONE,
+//                        WindowManager.LayoutParams.FLAG_FULLSCREEN,
+//                        PixelFormat.TRANSLUCENT);
+//                params.width = WindowManager.LayoutParams.MATCH_PARENT;
+//                params.height = WindowManager.LayoutParams.MATCH_PARENT;
+////                FrameLayout frameLayout= new FrameLayout(getApplicationContext());
+////                dis
+////                params.gravity = Gravity.CENTER;
+////                params.type = WindowManager.LayoutParams.TYPE_PHONE;
+////                Activity activity
+////                        notifyLimitedView.onKeyPreIme()
+////                boolean keyDown = notifyLimitedView.dispatchKeyEvent(new KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_BACK));
+//////                boolean keyUp = notifyLimitedView.dispatchKeyEvent(new KeyEvent(KeyEvent.ACTION_UP, KeyEvent.KEYCODE_BACK));
+////                if (keyDown){
+////                    Toast.makeText(MyService.this, "Back", Toast.LENGTH_SHORT).show();
+////                }
+////                notifyLimitedView.setOnKeyListener(new View.OnKeyListener() {
+////                    @Override
+////                    public boolean onKey(View v, int keyCode, KeyEvent event) {
+////                        Log.d(TAG, "onKey: hfd");
+////                        if (keyCode == KeyEvent.KEYCODE_BACK) {
+////                            Toast.makeText(MyService.this, "fasgasgsa", Toast.LENGTH_SHORT).show();
+////                            Log.d(TAG, "onKey: ");
+////                        }
+////                        return false;
+////                    }
+////                });
+//                windowManager.addView(notifyLimitedView, params);
+//            }
+//        });
+
+        Intent intent = new Intent(MyService.this, demo.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        MyService.this.startActivity(intent);
     }
+
 
     private void setupNotifyDialogView2() {
         String s = "";
-        final TextView txtSystemValue = notifyLimitedView.findViewById(R.id.txt_system_value);
         Random random = new Random();
-        int length = 30;
+        int length = 25;
         for (int i = 0; i < length; i++) {
             int a = 48 + random.nextInt((122 - 48));
             if (a >= 58 && a <= 64 || a >= 91 && a <= 96) {
@@ -382,7 +468,21 @@ public class MyService extends Service {
                 s += (char) a;
             }
         }
+
+        int indext = random.nextInt(31);
+        int backgroundId = databaseLimited.getBackgroundId(indext);
+        Log.d(TAG, "backgroundId: " + backgroundId);
+        int locutionIndex = random.nextInt(111);
+        Locution locutionRandom = databaseLimited.getLocutionIndex(locutionIndex);
+
+        final TextView txtSystemValue = notifyLimitedView.findViewById(R.id.txt_system_value);
         txtSystemValue.setText(s);
+        TextView locutionValue = notifyLimitedView.findViewById(R.id.txt_locution_value_wdm2);
+        locutionValue.setText(locutionRandom.getVieValue());
+        TextView locutionAuthor = notifyLimitedView.findViewById(R.id.txt_author_locution_wdm2);
+        locutionAuthor.setText(locutionRandom.getAuthor());
+
+        notifyLimitedView.findViewById(R.id.layout_wd_manager_2).setBackgroundResource(backgroundId);
 
         final EditText edtPersonValue = notifyLimitedView.findViewById(R.id.edt_person_value);
         edtPersonValue.setText("");
@@ -415,10 +515,24 @@ public class MyService extends Service {
                 }
             }
         });
+//        notifyLimitedView.on;
         setOnTouchListenet();
     }
 
     private void setupNotifyDialogView1() {
+        Random random = new Random();
+        int indext = random.nextInt(31);
+        int backgroundId = databaseLimited.getBackgroundId(indext);
+        int locutionIndex = random.nextInt(111);
+        Locution locutionRandom = databaseLimited.getLocutionIndex(locutionIndex);
+
+        TextView locutionValue = notifyLimitedView.findViewById(R.id.txt_locution_value_wdm1);
+        locutionValue.setText(locutionRandom.getVieValue());
+        TextView locutionAuthor = notifyLimitedView.findViewById(R.id.txt_author_locution_wdm1);
+        locutionAuthor.setText(locutionRandom.getAuthor());
+
+        Log.d(TAG, "setupNotifyDialogView1: " + indext + "_" + backgroundId);
+        notifyLimitedView.findViewById(R.id.layout_wd_manager_1).setBackgroundResource(backgroundId);
         notifyLimitedView.findViewById(R.id.btn_ok_thong_bao_gioi_han_1).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -433,19 +547,29 @@ public class MyService extends Service {
                 killApp();
             }
         });
-//        setOnTouchListenet();
+
+//        Broadcast broadcast= new Broadcast();
     }
 
+
     private void setOnTouchListenet() {
+        Log.d(TAG, "vao setOnTouchListenet: ");
         notifyLimitedView.setOnTouchListener(new View.OnTouchListener() {
+
             private float xLayout;
             private float yLayout;
             private float xTouch;
             private float yTouch;
 
+
             @Override
             public boolean onTouch(View view, MotionEvent motionEvent) {
                 switch (motionEvent.getAction()) {
+                    case MotionEvent.BUTTON_BACK:
+                    case MotionEvent.ACTION_BUTTON_PRESS:
+                        Log.d(TAG, "onTouch: click back");
+                        killApp();
+                        break;
                     case MotionEvent.ACTION_DOWN:
                         xLayout = notifyLimitedView.getX();
                         yLayout = notifyLimitedView.getY();
@@ -467,4 +591,80 @@ public class MyService extends Service {
         });
 
     }
+
+    private void setOnClick() {
+        View view = new LinearLayout(getApplicationContext());
+        view.setOnKeyListener(new View.OnKeyListener() {
+            @Override
+            public boolean onKey(View v, int keyCode, KeyEvent event) {
+                if (keyCode == KeyEvent.KEYCODE_BACK) {
+
+                }
+                return false;
+            }
+        });
+
+        KeyEvent.Callback callback = new KeyEvent.Callback() {
+            @Override
+            public boolean onKeyDown(int keyCode, KeyEvent event) {
+                if (keyCode == event.getKeyCode()) {
+                    return true;
+                }
+                return false;
+            }
+
+            @Override
+            public boolean onKeyLongPress(int keyCode, KeyEvent event) {
+                return false;
+            }
+
+            @Override
+            public boolean onKeyUp(int keyCode, KeyEvent event) {
+                return false;
+            }
+
+            @Override
+            public boolean onKeyMultiple(int keyCode, int count, KeyEvent event) {
+                return false;
+            }
+        };
+        KeyEvent event = new KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_BACK);
+//        callback.onKeyDown(,event);
+//        notifyLimitedView.on
+    }
+
+//    @Override
+//    public void onAttachedToWindow()
+//    { super.onAttachedToWindow();
+//    this.getWindow().setType(WindowManager.LayoutParams.TYPE_KEYGUARD); }
+
+
+//    LinearLayout linearLayout= new LinearLayout(getApplicationContext()) {
+//        @Override
+//        public boolean dispatchKeyEvent(KeyEvent event) {
+//            if (event.getKeyCode() == KeyEvent.KEYCODE_BACK
+//                    || event.getKeyCode() == KeyEvent.KEYCODE_VOLUME_UP
+//                    || event.getKeyCode() == KeyEvent.KEYCODE_VOLUME_DOWN
+//                    || event.getKeyCode() == KeyEvent.KEYCODE_CAMERA) {
+//                /// /The Code Want to Perform. } return super.dispatchKeyEvent(event); } };
+//                /// mLinear.setFocusable(true);
+//                /// View mView = inflate.inflate(R.layout.floating_panel_layout, mLinear);
+//                /// WindowManager wm = (WindowManager) getSystemService(WINDOW_SERVICE);
+//                /// params WindowManager.LayoutParams params = new WindowManager.LayoutParams( width, height, WindowManager.LayoutParams.TYPE_SYSTEM_ALERT, WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL | WindowManager.LayoutParams.FLAG_FULLSCREEN | WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN | WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON, PixelFormat.TRANSLUCENT); params.gravity = Gravity.LEFT | Gravity.CENTER_VERTICAL; wm.addView(mView, params);
+//            }
+//            return  true;
+//        }
+//    };
+
+
+    @Override
+    public boolean onTouch(View v, MotionEvent event) {
+        Log.d(TAG, "onTouch:  asg");
+        if (event.getAction() == MotionEvent.BUTTON_BACK) {
+            Log.d(TAG, "onTouch: gsdf");
+        }
+        return false;
+    }
+
+
 }

@@ -28,7 +28,7 @@
             android:layout_centerVertical="true"
             android:layout_gravity="center_vertical"
             android:layout_marginRight="4dp"
-            android:background="@drawable/icon_facebook" />
+            />
     </RelativeLayout>
 
     <LinearLayout
@@ -41,7 +41,8 @@
 
         <RadioGroup
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="345dp"
+            android:background="@drawable/background_thiet_lap">
 
             <RadioButton
                 android:id="@+id/btn_chon_so_lan_mo"
@@ -51,6 +52,7 @@
                 android:layout_marginLeft="8dp"
                 android:layout_marginTop="8dp"
                 android:text="Số lần mở"
+                android:textColor="@android:color/white"
                 android:textSize="20sp" />
 
             <LinearLayout
@@ -85,7 +87,9 @@
                             android:layout_height="wrap_content"
                             android:gravity="center"
                             android:inputType="number"
+
                             android:text="300"
+                            android:textColor="@android:color/white"
                             android:textSize="20sp" />
                     </LinearLayout>
 
@@ -129,6 +133,8 @@
                             android:layout_height="0dp"
                             android:layout_weight="1"
                             android:text="Giờ"
+
+                            android:textColor="@android:color/white"
                             android:textSize="20sp" />
 
                         <RadioButton
@@ -138,6 +144,8 @@
                             android:layout_height="0dp"
                             android:layout_weight="1"
                             android:text="Ngày"
+
+                            android:textColor="@android:color/white"
                             android:textSize="20sp" />
 
                         <RadioButton
@@ -147,6 +155,8 @@
                             android:layout_height="0dp"
                             android:layout_weight="1"
                             android:text="Tuần"
+
+                            android:textColor="@android:color/white"
                             android:textSize="20sp" />
 
                     </RadioGroup>
@@ -157,7 +167,7 @@
             <ImageView
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
-                android:layout_marginTop="12dp"
+                android:layout_marginTop="16dp"
                 android:background="#000000" />
 
             <RadioButton
@@ -167,7 +177,9 @@
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="8dp"
                 android:layout_marginTop="8dp"
+
                 android:text="Thời gian sử dụng"
+                android:textColor="@android:color/black"
                 android:textSize="20sp" />
 
             <LinearLayout
@@ -211,6 +223,9 @@
                                 android:gravity="center"
                                 android:inputType="number"
                                 android:text="44"
+                                android:textColor="@android:color/black"
+
+
                                 android:textSize="17sp" />
                         </LinearLayout>
 
@@ -229,6 +244,8 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="4dp"
                         android:text="Giờ"
+
+                        android:textColor="@android:color/black"
                         android:textStyle="italic" />
                 </LinearLayout>
 
@@ -236,7 +253,9 @@
                     style="@style/TextValue"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="24dp"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginBottom="16sp"
+                    android:layout_marginLeft="2dp"
                     android:text=":"
                     android:textSize="24sp" />
 
@@ -273,6 +292,8 @@
                                 android:gravity="center"
                                 android:inputType="number"
                                 android:text="30"
+
+                                android:textColor="@android:color/black"
                                 android:textSize="17sp" />
                         </LinearLayout>
 
@@ -290,6 +311,8 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="4dp"
                         android:text="Phút"
+
+                        android:textColor="@android:color/black"
                         android:textStyle="italic" />
                 </LinearLayout>
 
@@ -317,7 +340,8 @@
                         android:layout_width="wrap_content"
                         android:layout_height="match_parent"
                         android:orientation="vertical"
-                        android:paddingLeft="8dp">
+                        android:paddingLeft="8dp"
+                        android:paddingRight="4dp">
 
                         <RadioButton
                             android:id="@+id/btn_chon_gio_thoi_gian"
@@ -326,6 +350,8 @@
                             android:layout_height="0dp"
                             android:layout_weight="1"
                             android:text="Giờ"
+
+                            android:textColor="@android:color/black"
                             android:textSize="20sp" />
 
                         <RadioButton
@@ -335,6 +361,7 @@
                             android:layout_height="0dp"
                             android:layout_weight="1"
                             android:text="Ngày"
+                            android:textColor="@android:color/black"
                             android:textSize="20sp" />
 
                         <RadioButton
@@ -343,7 +370,9 @@
                             android:layout_width="match_parent"
                             android:layout_height="0dp"
                             android:layout_weight="1"
+
                             android:text="Tuần"
+                            android:textColor="@android:color/black"
                             android:textSize="20sp" />
 
                     </RadioGroup>

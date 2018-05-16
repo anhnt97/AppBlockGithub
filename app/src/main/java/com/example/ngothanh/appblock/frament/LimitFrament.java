@@ -7,6 +7,7 @@ import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.graphics.drawable.Icon;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -40,6 +41,7 @@ import java.util.List;
  */
 
 public class LimitFrament extends Fragment implements ItemAppAdapter.OnItemClickListener, ItemAppAdapter.OnItemLongClickListener {
+    private static final String TAG="LimitFrament";
     private PackageManager packageManager;
     private Context context;
     private View rootView;
@@ -55,6 +57,7 @@ public class LimitFrament extends Fragment implements ItemAppAdapter.OnItemClick
     private boolean isChosseSoLan = false;
     private boolean isChosseThoiGian = false;
     private int flagLevel = 0;
+    private DatabaseLimited databaseLimited;
 
 
     @Override
@@ -107,7 +110,7 @@ public class LimitFrament extends Fragment implements ItemAppAdapter.OnItemClick
             }
         }
 
-        DatabaseLimited databaseLimited = new DatabaseLimited(context);
+        databaseLimited = new DatabaseLimited(context);
         ArrayList<AppLimited> appLimiteds = databaseLimited.getListAppIsLimited();
 
 
@@ -154,9 +157,10 @@ public class LimitFrament extends Fragment implements ItemAppAdapter.OnItemClick
     @Override
     public void onItemClicked(View itemView, int position, String packageName) {
         ImageView view = iconAppAdapter.getIconApp(position).getImgIconApp();
-        BitmapDrawable drawableIcon = (BitmapDrawable) view.getDrawable();
-        Bitmap bitmapIcon = drawableIcon.getBitmap();
-        showDialogLuaChon(bitmapIcon, packageName);
+        Drawable drawable= view.getDrawable();
+//        BitmapDrawable drawableIcon = (BitmapDrawable) view.getDrawable();
+//        Bitmap bitmapIcon = drawableIcon.getBitmap();
+        showDialogLuaChon(drawable, packageName);
     }
 
     @Override
@@ -167,13 +171,12 @@ public class LimitFrament extends Fragment implements ItemAppAdapter.OnItemClick
     @Override
     public void onImageStatusClicked(int position, String packageName) {
         ImageView view = iconAppAdapter.getIconApp(position).getImgIconApp();
-        BitmapDrawable drawableIcon = (BitmapDrawable) view.getDrawable();
-        Bitmap bitmapIcon = drawableIcon.getBitmap();
-        showDialogLuaChon(bitmapIcon, packageName);
+        Drawable drawable= view.getDrawable();
+        showDialogLuaChon(drawable, packageName);
     }
 
 
-    private void showDialogLuaChon(final Bitmap bitmapIconApp, final String packageName) {
+    private void showDialogLuaChon(final Drawable drawable, final String packageName) {
         final Dialog dialog = new Dialog(context);
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
         dialog.setContentView(R.layout.dialog_lua_chon_gioi_han);
@@ -197,10 +200,12 @@ public class LimitFrament extends Fragment implements ItemAppAdapter.OnItemClick
                         break;
                     case R.id.btn_tiep_lua_chon:
                         if (flagSelect == 1) {
+                            dialog.dismiss();
                             showDialogLoi("Tính năng đang được phát triển, sẽ có trong phiên bản tiếp theo!");
                         } else if (flagSelect == -1) {
-                            showDialogThietLapGioiHan1(bitmapIconApp, packageName);
                             dialog.dismiss();
+                            Log.d(TAG, "sau click");
+                            showDialogThietLapGioiHan1(drawable, packageName);
                         }
                         break;
                     case R.id.btn_tro_ve_lua_chon:
@@ -218,12 +223,12 @@ public class LimitFrament extends Fragment implements ItemAppAdapter.OnItemClick
         dialog.show();
     }
 
-    private void showDialogThietLapGioiHan1(final Bitmap bitmapIconApp, final String packageName) {
+    private void showDialogThietLapGioiHan1(final Drawable drawable, final String packageName) {
         final Dialog dialog = new Dialog(context);
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
         dialog.setContentView(R.layout.dialog_thiet_lap_gioi_han_1);
 
-
+        Log.d(TAG, "vào dialog 1");
         ImageView imgIconApp = dialog.findViewById(R.id.img_icon_app_in_thiet_lap_1);
         final RadioButton btnChonSoLan = dialog.findViewById(R.id.btn_chon_so_lan_mo);
         ImageView btnTangSoLan = dialog.findViewById(R.id.btn_tang_so_lan);
@@ -233,6 +238,7 @@ public class LimitFrament extends Fragment implements ItemAppAdapter.OnItemClick
         final RadioButton btnChonNgaySoLan = dialog.findViewById(R.id.btn_chon_ngay_so_lan_mo);
         final RadioButton btnChonTuanSoLan = dialog.findViewById(R.id.btn_chon_tuan_so_lan_mo);
 
+        Log.d(TAG, "show so lan mo");
         final RadioButton btnChonThoiGian = dialog.findViewById(R.id.btn_chon_thoi_gian_su_dung);
         ImageView btnTangGioThoiGian = dialog.findViewById(R.id.btn_tang_gio_thoi_gian);
         final EditText edtSoGioThoiGian = dialog.findViewById(R.id.edt_so_gio_thoi_gian);
@@ -247,7 +253,10 @@ public class LimitFrament extends Fragment implements ItemAppAdapter.OnItemClick
         TextView btnTroVe = dialog.findViewById(R.id.btn_tro_ve_thiet_lap_1);
         TextView btnTiep = dialog.findViewById(R.id.btn_tiep_thiet_lap_1);
 
-        imgIconApp.setImageBitmap(bitmapIconApp);
+//        Icon icon= new
+        imgIconApp.setImageDrawable(drawable);
+//        imgIconApp.setImageBitmap(bitmapIconApp);
+        Log.d(TAG, "show hết dialog");
         edtSoLanMo.setText("0");
         edtSoLanMo.setTextSize(20);
         edtSoGioThoiGian.setText("0");
@@ -424,7 +433,7 @@ public class LimitFrament extends Fragment implements ItemAppAdapter.OnItemClick
 
                                 } else {
 
-                                    showDialogThietLapGioiHan2(bitmapIconApp, packageName);
+                                    showDialogThietLapGioiHan2(drawable, packageName);
                                     dialog.dismiss();
                                     //Todo
                                 }
@@ -441,7 +450,7 @@ public class LimitFrament extends Fragment implements ItemAppAdapter.OnItemClick
                                         if (soThoiGianThietLap[0] >= 1) {
                                             showDialogLoi("Xin vui lòng kiểm tra lại thiết lập giới hạn!");
                                         } else {
-                                            showDialogThietLapGioiHan2(bitmapIconApp, packageName);
+                                            showDialogThietLapGioiHan2(drawable, packageName);
                                             dialog.dismiss();
                                         }
                                         break;
@@ -449,7 +458,7 @@ public class LimitFrament extends Fragment implements ItemAppAdapter.OnItemClick
                                         if (soThoiGianThietLap[0] >= 24) {
                                             showDialogLoi("Xin vui lòng kiểm tra lại thiết lập giới hạn!");
                                         } else {
-                                            showDialogThietLapGioiHan2(bitmapIconApp, packageName);
+                                            showDialogThietLapGioiHan2(drawable, packageName);
                                             dialog.dismiss();
                                         }
                                         break;
@@ -457,7 +466,7 @@ public class LimitFrament extends Fragment implements ItemAppAdapter.OnItemClick
                                         if ((soThoiGianThietLap[0] >= 168)) {
                                             showDialogLoi("Xin vui lòng kiểm tra lại thiết lập giới hạn!");
                                         } else {
-                                            showDialogThietLapGioiHan2(bitmapIconApp, packageName);
+                                            showDialogThietLapGioiHan2(drawable, packageName);
                                             dialog.dismiss();
                                         }
                                         break;
@@ -498,7 +507,7 @@ public class LimitFrament extends Fragment implements ItemAppAdapter.OnItemClick
 
     }
 
-    private void showDialogThietLapGioiHan2(final Bitmap bitmapIconApp, final String packageName) {
+    private void showDialogThietLapGioiHan2(final Drawable drawable, final String packageName) {
         final Dialog dialog = new Dialog(context);
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
         dialog.setContentView(R.layout.dialog_thiet_lap_gioi_han_2);
@@ -510,7 +519,8 @@ public class LimitFrament extends Fragment implements ItemAppAdapter.OnItemClick
         TextView btnTao = dialog.findViewById(R.id.btn_tao_thiet_lap_2);
         ImageView imgIconApp = dialog.findViewById(R.id.img_icon_app_in_thiet_lap_2);
 
-        imgIconApp.setImageBitmap(bitmapIconApp);
+        imgIconApp.setImageDrawable(drawable);
+//        imgIconApp.setImageBitmap(bitmapIconApp);
 
         View.OnClickListener onClickListener = new View.OnClickListener() {
             @Override
@@ -533,12 +543,12 @@ public class LimitFrament extends Fragment implements ItemAppAdapter.OnItemClick
                         break;
                     case R.id.btn_tro_ve_thiet_lap_2:
                         dialog.dismiss();
-                        showDialogThietLapGioiHan1(bitmapIconApp, packageName);
+                        showDialogThietLapGioiHan1(drawable, packageName);
                         break;
                     case R.id.btn_tao_thiet_lap_2:
                         if (flagLevel != 0) {
                             //Todo ghi dữ liệu vào database
-                            DatabaseLimited databaseLimited = new DatabaseLimited(context);
+//                            DatabaseLimited databaseLimited = new DatabaseLimited(context);
                             int typeLimit;
                             int numberIsOpen = soLanThietLap;
                             int[] countTime = new int[2];

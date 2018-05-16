@@ -182,8 +182,7 @@ public class RunningFrament extends Fragment implements ItemAppAdapter.OnItemCli
     public void onItemClicked(View itemView, int position, String packageName) {
         Log.d("MyService", "in runnung: " + appLimiteds.get(position).getCountDown());
         ImageView view = iconAppAdapter.getIconApp(position).getImgIconApp();
-        BitmapDrawable drawableIcon = (BitmapDrawable) view.getDrawable();
-        Bitmap bitmapIcon = drawableIcon.getBitmap();
+        Drawable drawable= view.getDrawable();
         String appName = iconAppAdapter.getIconApp(position).getTxtAppName();
 
         AppLimited limited = appLimiteds.get(position);
@@ -204,7 +203,7 @@ public class RunningFrament extends Fragment implements ItemAppAdapter.OnItemCli
         TextView txtStatus = dialog.findViewById(R.id.txt_set_status_about);
 
         setAppName.setText(appName);
-        iconApp.setImageBitmap(bitmapIcon);
+        iconApp.setImageDrawable(drawable);
         if (type == 1) {
             setkieuGioiHan.setText("Số lần mở");
             txtHinhThucGioiHan.setText("Số lần cài đặt");
@@ -247,8 +246,7 @@ public class RunningFrament extends Fragment implements ItemAppAdapter.OnItemCli
         loadSettingLimitApp(packageName);
 
         ImageView view = iconAppAdapter.getIconApp(position).getImgIconApp();
-        BitmapDrawable drawableIcon = (BitmapDrawable) view.getDrawable();
-        final Bitmap bitmapIcon = drawableIcon.getBitmap();
+        final Drawable drawable= view.getDrawable();
 
         final Dialog dialog = new Dialog(getActivity());
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
@@ -264,7 +262,7 @@ public class RunningFrament extends Fragment implements ItemAppAdapter.OnItemCli
             public void onClick(View view) {
                 switch (view.getId()) {
                     case R.id.btn_sua:
-                        showDialogThietLapGioiHan1(position, bitmapIcon, packageName);
+                        showDialogThietLapGioiHan1(position, drawable, packageName);
                         dialog.dismiss();
                         break;
                     case R.id.btn_xoa:
@@ -397,7 +395,7 @@ public class RunningFrament extends Fragment implements ItemAppAdapter.OnItemCli
         databaseLimited.updateToLimitedDatabase(limited);
     }
 
-    private void showDialogThietLapGioiHan1(final int positionClick, final Bitmap bitmapIconApp, final String packageName) {
+    private void showDialogThietLapGioiHan1(final int positionClick, final Drawable drawable, final String packageName) {
         final Dialog dialog = new Dialog(getActivity());
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
         dialog.setContentView(R.layout.dialog_thiet_lap_gioi_han_1);
@@ -442,7 +440,7 @@ public class RunningFrament extends Fragment implements ItemAppAdapter.OnItemCli
         final TextView btnTroVe = dialog.findViewById(R.id.btn_tro_ve_thiet_lap_1);
         TextView btnTiep = dialog.findViewById(R.id.btn_tiep_thiet_lap_1);
 
-        imgIconApp.setImageBitmap(bitmapIconApp);
+        imgIconApp.setImageDrawable(drawable);
 
 
         if (afterIsChosseSoLan[0] == 1) {
@@ -660,7 +658,7 @@ public class RunningFrament extends Fragment implements ItemAppAdapter.OnItemCli
                                 showDialogLoi("Xin vui lòng kiểm tra lại thiết lập giới hạn!");
                             } else {
                                 //Todo
-                                showDialogThietLapGioiHan2(positionClick, bitmapIconApp, packageName);
+                                showDialogThietLapGioiHan2(positionClick, drawable, packageName);
                                 dialog.dismiss();
                             }
                         } else {
@@ -684,7 +682,7 @@ public class RunningFrament extends Fragment implements ItemAppAdapter.OnItemCli
                                         if (afterSoThoiGianThietLap[0] >= 1) {
                                             showDialogLoi("Xin vui lòng kiểm tra lại thiết lập giới hạn!");
                                         } else {
-                                            showDialogThietLapGioiHan2(positionClick, bitmapIconApp, packageName);
+                                            showDialogThietLapGioiHan2(positionClick, drawable, packageName);
                                             dialog.dismiss();
                                         }
                                     }
@@ -692,7 +690,7 @@ public class RunningFrament extends Fragment implements ItemAppAdapter.OnItemCli
                                         if (afterSoThoiGianThietLap[0] >= 24) {
                                             showDialogLoi("Xin vui lòng kiểm tra lại thiết lập giới hạn!");
                                         } else {
-                                            showDialogThietLapGioiHan2(positionClick, bitmapIconApp, packageName);
+                                            showDialogThietLapGioiHan2(positionClick, drawable, packageName);
                                             dialog.dismiss();
                                         }
                                     }
@@ -700,7 +698,7 @@ public class RunningFrament extends Fragment implements ItemAppAdapter.OnItemCli
                                         if ((afterSoThoiGianThietLap[0] >= 168)) {
                                             showDialogLoi("Xin vui lòng kiểm tra lại thiết lập giới hạn!");
                                         } else {
-                                            showDialogThietLapGioiHan2(positionClick, bitmapIconApp, packageName);
+                                            showDialogThietLapGioiHan2(positionClick, drawable, packageName);
                                             dialog.dismiss();
                                         }
                                     }
@@ -756,7 +754,7 @@ public class RunningFrament extends Fragment implements ItemAppAdapter.OnItemCli
         dialog1.show();
     }
 
-    private void showDialogThietLapGioiHan2(final int positionClick, final Bitmap bitmapIconApp, final String packageName) {
+    private void showDialogThietLapGioiHan2(final int positionClick, final Drawable drawable, final String packageName) {
         final Dialog dialog = new Dialog(getActivity());
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
         dialog.setContentView(R.layout.dialog_thiet_lap_gioi_han_2);
@@ -782,7 +780,7 @@ public class RunningFrament extends Fragment implements ItemAppAdapter.OnItemCli
             btnTao.setText("Cập nhật");
         } else
             btnTao.setText("Ok");
-        imgIconApp.setImageBitmap(bitmapIconApp);
+        imgIconApp.setImageDrawable(drawable);
         switch (afterFlagLevel) {
             case 1:
                 btnChonLevelNhe.setChecked(true);

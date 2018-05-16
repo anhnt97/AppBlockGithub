@@ -28,7 +28,7 @@
             android:layout_centerVertical="true"
             android:layout_gravity="center_vertical"
             android:layout_marginRight="8dp"
-            android:background="@drawable/icon_facebook" />
+            />
     </RelativeLayout>
 
     <LinearLayout
