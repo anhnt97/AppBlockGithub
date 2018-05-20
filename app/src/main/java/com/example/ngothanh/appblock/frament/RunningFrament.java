@@ -6,10 +6,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Color;
-import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -33,7 +30,7 @@ import com.example.ngothanh.appblock.R;
 import com.example.ngothanh.appblock.adapter.ItemAppAdapter;
 import com.example.ngothanh.appblock.model.ItemApp;
 import com.example.ngothanh.appblock.sqlite.AppLimited;
-import com.example.ngothanh.appblock.sqlite.DatabaseLimited;
+import com.example.ngothanh.appblock.sqlite.Database;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -108,9 +105,9 @@ public class RunningFrament extends Fragment implements ItemAppAdapter.OnItemCli
 
     private void showListApps() {
         apps = new ArrayList<>();
-        DatabaseLimited databaseLimited = new DatabaseLimited(context);
+        Database database = new Database(context);
 
-        appLimiteds = databaseLimited.getListAppIsLimited();
+        appLimiteds = database.getListAppIsLimited();
         if (appLimiteds.size() == 0) {
 
         } else {
@@ -274,8 +271,8 @@ public class RunningFrament extends Fragment implements ItemAppAdapter.OnItemCli
                             @Override
                             public void onClick(DialogInterface dialogInterface, int i) {
                                 //Todo delete csdl
-                                DatabaseLimited databaseLimited = new DatabaseLimited(context);
-                                databaseLimited.deleteLimitedDatabase(packageName);
+                                Database database = new Database(context);
+                                database.deleteLimitedDatabase(packageName);
 //                                iconAppAdapter.notifyDataSetChanged();
                                 iconAppAdapter.remoItem(position);
                                 appLimiteds.remove(position);
@@ -322,7 +319,7 @@ public class RunningFrament extends Fragment implements ItemAppAdapter.OnItemCli
     @Override
     public void onImageStatusClicked(int position, String packageName) {
         final AppLimited limited = appLimiteds.get(position);
-        DatabaseLimited databaseLimited = new DatabaseLimited(context);
+        Database database = new Database(context);
         final ImageView view2 = new ImageView(context);
         if (limited.isLimited() == 1) {
             if (limited.getCountDown() <= 0) {
@@ -392,7 +389,7 @@ public class RunningFrament extends Fragment implements ItemAppAdapter.OnItemCli
         }
         iconAppAdapter.getIconApp(position).setImgStatus(view2);
         iconAppAdapter.notifyItemChanged(position);
-        databaseLimited.updateToLimitedDatabase(limited);
+        database.updateToLimitedDatabase(limited);
     }
 
     private void showDialogThietLapGioiHan1(final int positionClick, final Drawable drawable, final String packageName) {
@@ -868,8 +865,8 @@ public class RunningFrament extends Fragment implements ItemAppAdapter.OnItemCli
                                     afterFlagLevel,
                                     numberLimited,
                                     countDown, timeStart, timeEnd, timeRun);
-                            DatabaseLimited databaseLimited = new DatabaseLimited(context);
-                            databaseLimited.updateToLimitedDatabase(limited);
+                            Database database = new Database(context);
+                            database.updateToLimitedDatabase(limited);
                             apps.clear();
                             showListApps();
                             for (int i = 0; i < appLimiteds.size(); i++) {

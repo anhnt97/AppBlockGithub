@@ -16,15 +16,16 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Random;
 
 /**
  * Created by ngoth on 3/6/2018.
  */
 
-public class DatabaseLimited {
+public class Database {
     private static final String DATABASE_PATH = "/data/data/com.example.ngothanh.appblock/";
     private static final String DATABASE_NAME = "DanhNgonSqlite.db";
-    private static final String TAG = "DatabaseLimited";
+    private static final String TAG = "Database";
     private String destPathData;
     private SQLiteDatabase dbValue;
     private static final String TABLE_LIMITED = "AppLimited";
@@ -49,8 +50,10 @@ public class DatabaseLimited {
     private Context context;
     private int arrayBackgroundId[];
     private ArrayList<Locution> locutions;
+    private Random random;
 
-    public DatabaseLimited(Context context) {
+    public Database(Context context) {
+        random= new Random();
         this.context = context;
         initalizeDataBacgroundId();
         initalizeDataBase();
@@ -91,7 +94,8 @@ public class DatabaseLimited {
 //        arrayBackgroundId[30] = R.drawable.background_wdmanager_31;
     }
 
-    public int getBackgroundId(int index) {
+    public int getBackgroundId() {
+        int index= random.nextInt(30);
         return arrayBackgroundId[index];
     }
 
@@ -281,7 +285,8 @@ public class DatabaseLimited {
         cursor.close();
     }
 
-    public Locution getLocutionIndex(int index) {
+    public Locution getLocution() {
+        int index= random.nextInt(111);
         return locutions.get(index);
     }
 
