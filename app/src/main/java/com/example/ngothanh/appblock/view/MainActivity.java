@@ -21,6 +21,8 @@ import com.example.ngothanh.appblock.frament.RunningFrament;
 import com.example.ngothanh.appblock.frament.SecurityFrament;
 import com.example.ngothanh.appblock.service.MyService;
 
+import java.util.Date;
+
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
     private static final int REQUEST_CODE_PERMISSION = 111;
     private static final int SWIPE_THRESHOLD = 100;

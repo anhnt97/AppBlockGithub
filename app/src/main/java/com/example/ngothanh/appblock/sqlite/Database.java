@@ -43,7 +43,7 @@ public class Database {
     private static final String COLUMN_COUNT_DOWN = "countDown";
     private static final String COLUMN_TIME_START = "timeStart";
     private static final String COLUMN_TIME_END = "timeEnd";
-    private static final String COLUMN_TIME_IS_RUN = "timeIsRun";
+    private static final String COLUMN_TIME_LAST_SHOW = "timeLastShow";
     private static final String COLUMN_LOCUTION_VIEVALUE = "vieValue";
     private static final String COLUMN_LOCUTION_ENGVALUE = "engValue";
     private static final String COLUMN_LOCUTION_AUTHORVALUE = "author";
@@ -53,14 +53,14 @@ public class Database {
     private Random random;
 
     public Database(Context context) {
-        random= new Random();
+        random = new Random();
         this.context = context;
         initalizeDataBacgroundId();
         initalizeDataBase();
     }
 
     private void initalizeDataBacgroundId() {
-        arrayBackgroundId = new int[30];
+        arrayBackgroundId = new int[31];
         arrayBackgroundId[0] = R.drawable.background_wdmanager_1;
         arrayBackgroundId[1] = R.drawable.background_wdmanager_2;
         arrayBackgroundId[2] = R.drawable.background_wdmanager_3;
@@ -91,11 +91,12 @@ public class Database {
         arrayBackgroundId[27] = R.drawable.background_wdmanager_28;
         arrayBackgroundId[28] = R.drawable.background_wdmanager_30;
         arrayBackgroundId[29] = R.drawable.background_wdmanager_31;
-//        arrayBackgroundId[30] = R.drawable.background_wdmanager_31;
+        arrayBackgroundId[30] = R.drawable.background_wdmanager_31;
     }
 
     public int getBackgroundId() {
-        int index= random.nextInt(30);
+        int index = random.nextInt(30);
+        Log.d("loi", "backgroundId: "+ index);
         return arrayBackgroundId[index];
     }
 
@@ -144,7 +145,7 @@ public class Database {
         openDb();
         String sql = "SELECT * FROM " + TABLE_LIMITED;
         Cursor cursor = dbValue.rawQuery(sql, null);
-        if (cursor == null) {
+        if (cursor == null ) {
             return appLimiteds;
         }
         if (cursor.getCount() == 0) {
@@ -165,11 +166,11 @@ public class Database {
             int level = cursor.getInt(cursor.getColumnIndex(COLUMN_LEVEL));
             int numberLimited = cursor.getInt(cursor.getColumnIndex(COLUMN_NUMBER_LIMITED));
             int countDown = cursor.getInt(cursor.getColumnIndex(COLUMN_COUNT_DOWN));
-            int timeStart = cursor.getInt(cursor.getColumnIndex(COLUMN_TIME_START));
-            int timeEnd = cursor.getInt(cursor.getColumnIndex(COLUMN_TIME_END));
-            int timeRun = cursor.getInt(cursor.getColumnIndex(COLUMN_TIME_IS_RUN));
+            long timeStart = cursor.getLong(cursor.getColumnIndex(COLUMN_TIME_START));
+            long timeEnd = cursor.getLong(cursor.getColumnIndex(COLUMN_TIME_END));
+            long timeLastShow = cursor.getLong(cursor.getColumnIndex(COLUMN_TIME_LAST_SHOW));
             appLimiteds.add(new AppLimited(packageName, typeIsCountOpen, countIsOpen, time,
-                    objFinish, status, level, numberLimited, countDown, timeStart, timeEnd, timeRun));
+                    objFinish, status, level, numberLimited, countDown, timeStart, timeEnd, timeLastShow));
             cursor.moveToNext();
         }
         cursor.close();
@@ -193,7 +194,7 @@ public class Database {
         values.put(COLUMN_COUNT_DOWN, appLimited.getCountDown());
         values.put(COLUMN_TIME_START, appLimited.getTimeStart());
         values.put(COLUMN_TIME_END, appLimited.getTimeEnd());
-        values.put(COLUMN_TIME_IS_RUN, appLimited.getTimeIsRun());
+        values.put(COLUMN_TIME_LAST_SHOW, appLimited.getTimeLastShow());
         long result = dbValue.insert(TABLE_LIMITED, null, values);
         if (result <= -1) {
             Toast.makeText(context, "Thêm giới hạn gặp lỗi", Toast.LENGTH_SHORT).show();
@@ -218,7 +219,7 @@ public class Database {
         values.put(COLUMN_COUNT_DOWN, appLimited.getCountDown());
         values.put(COLUMN_TIME_START, appLimited.getTimeStart());
         values.put(COLUMN_TIME_END, appLimited.getTimeEnd());
-        values.put(COLUMN_TIME_IS_RUN, appLimited.getTimeIsRun());
+        values.put(COLUMN_TIME_LAST_SHOW, appLimited.getTimeLastShow());
         long result = dbValue.update(TABLE_LIMITED, values, COLUMN_LIMITED_PACKAGE_NAME + " = ? ", new String[]{appLimited.getPackageName()});
         closeDb();
         return result;
@@ -260,7 +261,7 @@ public class Database {
     }
 
     private void getListLocution() {
-        locutions= new ArrayList<>();
+        locutions = new ArrayList<>();
         openDb();
         String sql = "SELECT * FROM " + TABLE_LOCUTION;
         Cursor cursor = dbValue.rawQuery(sql, null);
@@ -286,7 +287,7 @@ public class Database {
     }
 
     public Locution getLocution() {
-        int index= random.nextInt(111);
+        int index = random.nextInt(111);
         return locutions.get(index);
     }
 

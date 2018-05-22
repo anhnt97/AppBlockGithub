@@ -32,7 +32,7 @@
             android:layout_marginStart="16dp"
             android:text="Thông báo giới hạn"
             android:textColor="#163491"
-            android:textSize="23sp" />
+            android:textSize="22sp" />
     </LinearLayout>
 
     <LinearLayout
@@ -56,13 +56,15 @@
             android:text="Bạn đã sử dụng ứng dụng vượt quá thiết lập giới hạn.
 Vui lòng nhập lại đoạn mã sau để tiếp tục sử dụng ứng dụng?"
             android:textColor="#000000"
-            android:textSize="20sp" />
+            android:textSize="19sp" />
 
         <TextView
+            android:textStyle="bold"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
             android:layout_marginBottom="8dp"
+            android:textSize="12sp"
             android:text="Lưu ý có phân biệt chữ hoa chữ thường !"
             android:textColor="#ff1e35" />
     </LinearLayout>
@@ -91,7 +93,7 @@ Vui lòng nhập lại đoạn mã sau để tiếp tục sử dụng ứng dụ
             android:paddingTop="2dp"
             android:text="QHDTNFfkxurg12579GBgTDHTD"
             android:textColor="#163491"
-            android:textSize="19dp"
+            android:textSize="18dp"
             android:textStyle="bold|italic" />
 
         <EditText
@@ -106,7 +108,7 @@ Vui lòng nhập lại đoạn mã sau để tiếp tục sử dụng ứng dụ
             android:paddingTop="2dp"
             android:text=""
             android:textColor="#163491"
-            android:textSize="19dp"
+            android:textSize="18dp"
             android:textStyle="italic|bold" />
     </LinearLayout>
 
@@ -115,7 +117,7 @@ Vui lòng nhập lại đoạn mã sau để tiếp tục sử dụng ứng dụ
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_above="@id/rlt_layout_btn_wdmanager_1"
-        android:layout_marginBottom="12dp"
+        android:layout_marginBottom="2dp"
         android:layout_marginLeft="16dp"
         android:layout_marginRight="16dp"
         android:background="#87e8efef"
@@ -130,7 +132,7 @@ Vui lòng nhập lại đoạn mã sau để tiếp tục sử dụng ứng dụ
             android:gravity="center"
             android:text="Hoặc bạn đuổi theo thời gian hoặc thời gian sẽ đuổi theo bạn."
             android:textColor="#163491"
-            android:textSize="20sp"
+            android:textSize="18sp"
             android:textStyle="italic" />
 
         <TextView
@@ -139,11 +141,11 @@ Vui lòng nhập lại đoạn mã sau để tiếp tục sử dụng ứng dụ
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
             android:layout_gravity="right"
-            android:layout_marginRight="4dp"
-            android:layout_marginTop="4dp"
+            android:layout_marginRight="2dp"
+            android:layout_marginTop="2dp"
             android:text="Jim Rhon"
             android:textColor="#02248f"
-            android:textSize="18sp"
+            android:textSize="17sp"
             android:textStyle="italic|bold" />
     </LinearLayout>
 

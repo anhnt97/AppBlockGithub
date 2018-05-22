@@ -38,7 +38,7 @@ import java.util.List;
  */
 
 public class LimitFrament extends Fragment implements ItemAppAdapter.OnItemClickListener, ItemAppAdapter.OnItemLongClickListener {
-    private static final String TAG="LimitFrament";
+    private static final String TAG = "LimitFrament";
     private PackageManager packageManager;
     private Context context;
     private View rootView;
@@ -154,7 +154,7 @@ public class LimitFrament extends Fragment implements ItemAppAdapter.OnItemClick
     @Override
     public void onItemClicked(View itemView, int position, String packageName) {
         ImageView view = iconAppAdapter.getIconApp(position).getImgIconApp();
-        Drawable drawable= view.getDrawable();
+        Drawable drawable = view.getDrawable();
 //        BitmapDrawable drawableIcon = (BitmapDrawable) view.getDrawable();
 //        Bitmap bitmapIcon = drawableIcon.getBitmap();
         showDialogLuaChon(drawable, packageName);
@@ -168,7 +168,7 @@ public class LimitFrament extends Fragment implements ItemAppAdapter.OnItemClick
     @Override
     public void onImageStatusClicked(int position, String packageName) {
         ImageView view = iconAppAdapter.getIconApp(position).getImgIconApp();
-        Drawable drawable= view.getDrawable();
+        Drawable drawable = view.getDrawable();
         showDialogLuaChon(drawable, packageName);
     }
 
@@ -300,6 +300,8 @@ public class LimitFrament extends Fragment implements ItemAppAdapter.OnItemClick
                         btnChonThoiGian.setChecked(false);
                         btnChonSoLan.setChecked(true);
                         btnChonGioSoLan.setChecked(true);
+                        btnChonNgaySoLan.setChecked(false);
+                        btnChonTuanSoLan.setChecked(false);
                         isChosseSoLan = true;
                         isChosseThoiGian = false;
                         flagChonMocGioiHan = -1;
@@ -310,6 +312,8 @@ public class LimitFrament extends Fragment implements ItemAppAdapter.OnItemClick
                         btnChonTuanThoiGian.setChecked(false);
                         btnChonThoiGian.setChecked(false);
                         btnChonSoLan.setChecked(true);
+                        btnChonGioSoLan.setChecked(false);
+                        btnChonTuanSoLan.setChecked(false);
                         btnChonNgaySoLan.setChecked(true);
                         isChosseSoLan = true;
                         isChosseThoiGian = false;
@@ -322,6 +326,8 @@ public class LimitFrament extends Fragment implements ItemAppAdapter.OnItemClick
                         btnChonThoiGian.setChecked(false);
                         btnChonSoLan.setChecked(true);
                         btnChonTuanSoLan.setChecked(true);
+                        btnChonGioSoLan.setChecked(false);
+                        btnChonNgaySoLan.setChecked(false);
                         isChosseSoLan = true;
                         isChosseThoiGian = false;
                         flagChonMocGioiHan = 1;
@@ -330,6 +336,7 @@ public class LimitFrament extends Fragment implements ItemAppAdapter.OnItemClick
                         btnChonGioSoLan.setChecked(false);
                         btnChonNgaySoLan.setChecked(false);
                         btnChonTuanSoLan.setChecked(false);
+                        btnChonSoLan.setChecked(false);
                         isChosseThoiGian = true;
                         isChosseSoLan = false;
                         break;
@@ -387,6 +394,8 @@ public class LimitFrament extends Fragment implements ItemAppAdapter.OnItemClick
                         btnChonSoLan.setChecked(false);
                         btnChonThoiGian.setChecked(true);
                         btnChonGioThoiGian.setChecked(true);
+                        btnChonTuanThoiGian.setChecked(false);
+                        btnChonNgayThoiGian.setChecked(false);
                         isChosseThoiGian = true;
                         isChosseSoLan = false;
                         flagChonMocGioiHan = -1;
@@ -395,6 +404,8 @@ public class LimitFrament extends Fragment implements ItemAppAdapter.OnItemClick
                         btnChonGioSoLan.setChecked(false);
                         btnChonNgaySoLan.setChecked(false);
                         btnChonTuanSoLan.setChecked(false);
+                        btnChonGioThoiGian.setChecked(false);
+                        btnChonTuanThoiGian.setChecked(false);
                         btnChonThoiGian.setChecked(true);
                         btnChonSoLan.setChecked(false);
                         btnChonNgayThoiGian.setChecked(true);
@@ -407,6 +418,8 @@ public class LimitFrament extends Fragment implements ItemAppAdapter.OnItemClick
                         btnChonTuanSoLan.setChecked(false);
                         btnChonGioSoLan.setChecked(false);
                         btnChonThoiGian.setChecked(true);
+                        btnChonGioThoiGian.setChecked(false);
+                        btnChonNgayThoiGian.setChecked(false);
                         btnChonSoLan.setChecked(false);
                         btnChonTuanThoiGian.setChecked(true);
                         isChosseThoiGian = true;
@@ -578,7 +591,7 @@ public class LimitFrament extends Fragment implements ItemAppAdapter.OnItemClick
                             }
                             int numberLimited = countDown;
 
-                            int timeEnd = timeStart;
+                            long timeEnd = timeStart;
                             switch (flagChonMocGioiHan) {
                                 case -1:
                                     objFinish = "giờ";
@@ -595,11 +608,11 @@ public class LimitFrament extends Fragment implements ItemAppAdapter.OnItemClick
                                 default:
                                     break;
                             }
-                            int timeRun = 0;
-
+                            long timeLastShow=0;
 
                             AppLimited appLimited = new AppLimited(packageName, typeLimit,
-                                    numberIsOpen, countTime, objFinish, isLimit, level, numberLimited, countDown, timeStart, timeEnd, timeRun);
+                                    numberIsOpen, countTime, objFinish, isLimit, level, numberLimited,
+                                    countDown, timeStart, timeEnd,timeLastShow);
                             Log.d("MyService", "countdown add: " + appLimited.getCountDown());
                             long a = database.addToLimitedDatabase(appLimited);
 

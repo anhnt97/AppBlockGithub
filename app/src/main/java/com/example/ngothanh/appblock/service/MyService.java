@@ -27,29 +27,32 @@ import com.example.ngothanh.appblock.R;
 import com.example.ngothanh.appblock.sqlite.AppLimited;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.ConcurrentModificationException;
+import java.util.Date;
 import java.util.List;
 import java.util.Random;
 
 public class MyService extends Service {
     private static final int LIMIT_LEVEL_1 = 1000 * 60 * 3;
-    private static final int LIMIT_LEVEL_2 = 1000 * 6 * 5;
+    private static final int LIMIT_LEVEL_2 = 1000 * 60 * 5;
     private static final int LIMIT_LEVEL_3 = 0;
     private static final String TAG = "MyService";
     private static final String TAG2 = "MyService2";
     private final IBinder myBinder = new LocalBinder();
+    private long tempTimesMinus;
     private ArrayList<AppLimited> appLimiteds;
     private boolean isOpen = false;
     private Database database = new Database(this);
     private String rememberPackageName = "";
     private AppLimited appIsRunning;
-    private long timeLastUpdated = 0;
-    private long timeNow;
-    private long isLimited = 0; //thoi gian kiem tra limit
-    private long timeOnRun = 0; // thoi gian giua cac lan kiem tra
-    private long timeStart = 0;
+    private long timeLastUpdated = 0;   //thời gian lan update database cuoi
+    private long timeNow;   // thời gian hiện tại
+    private long timeLastShowToast = 0; // nhớ các lần show toast nhắc nhở.
+    private long timeOnRun = 0; // thời gian ứng dụng được chạy (Sử dụng cho kiểu giới hạn thời gian)
     private String tempRememberPackageName[] = new String[2];
-    private boolean countOpen = false;
+    private boolean showWmanager1 = false;
+    private boolean showWmanager2 = false;
 
     private WindowManager windowManager;
     private WindowManager.LayoutParams params;
@@ -72,7 +75,6 @@ public class MyService extends Service {
     public int onStartCommand(Intent intent, int flags, int startId) {
         windowManager = (WindowManager) getSystemService(WINDOW_SERVICE);
         Toast.makeText(this, "Chạy service", Toast.LENGTH_SHORT).show();
-        Log.d(TAG, "run Sẻvice");
         runCheckLimitApp();
         return START_STICKY;
     }
@@ -94,6 +96,13 @@ public class MyService extends Service {
                 while (true) {
                     timeNow = System.currentTimeMillis();
                     updateListDatabase();
+                    Date date = new Date();
+                    int valuedate = date.getDate();
+                    long value0 = date.getMonth();
+                    long value1 = date.getHours();
+                    long value2 = date.getMinutes();
+                    long value3 = date.getSeconds();
+//                    Log.d("da", "valuedate: "+ valuedate+"_"+value0+"_"+value1+"_"+value2+"_"+value3);
                     handlingService(context);
                 }
             }
@@ -118,14 +127,16 @@ public class MyService extends Service {
             rememberPackageName = temp;
             tempRememberPackageName[0] = temp;
         }
+
+        // khi app bị đóng
         if (!rememberPackageName.equals(temp)) {
             if (appIsRunning.isTypeIsCountOpen() == 0) {
-                long countDownMinus = System.currentTimeMillis() - timeStart;
+                long countDownMinus = System.currentTimeMillis() - timeOnRun;
                 appIsRunning.setCountDown(appIsRunning.getNumberLimited() - (int) countDownMinus);
                 database.updateToLimitedDatabase(appIsRunning);
                 Log.d(TAG2, "chay update");
-                timeOnRun = 0;
-                timeStart = 0;
+                timeLastShowToast = 0;
+                timeOnRun=0;
             }
 //            if (!tempRememberPackageName[1].equals(temp)) {
 ////                countOpen = true;
@@ -135,12 +146,11 @@ public class MyService extends Service {
 ////            tempRememberPackageName[1] = tempRememberPackageName[1];
 ////            tempRememberPackageName[0] = temp;
 
-            isLimited = 0;
             isOpen = false;
             appIsRunning = null;
             rememberPackageName = temp;
         } else {
-            //Khi package k doi
+            //Khi app vẫn hoạt động
             //Chi thuc hien khi man hinh mo
             if (isScreenOn) {
                 //Lay ra app co trong danh sach gioi han
@@ -151,20 +161,27 @@ public class MyService extends Service {
                     }
                 }
                 if (appIsRunning != null) {
+
+
+                    // Hình thức giới hạn số lần mở
                     if (appIsRunning.isTypeIsCountOpen() == 1) {
-                        //check con so lan gioi han va chua tung mo
-                        if (appIsRunning.getCountDown() > 0) {
-                            if (!isOpen || countOpen) {
+                        //Còn lần mở ứng dụng và ứng dụng chưa được mở
+                        if (appIsRunning.getCountDown() >= 0) {
+                            if (!isOpen) {
                                 appIsRunning.setCountDown(appIsRunning.getCountDown() - 1);
                                 database.updateToLimitedDatabase(appIsRunning);
                                 isOpen = true;
-                                if (appIsRunning.getCountDown() >= 2) {
-                                    toastMessenger(ctx, "Bạn còn " + (appIsRunning.getCountDown() - 1) + " lần mở ứng dụng");
+                                if (appIsRunning.getCountDown() >= 1) {
+                                    Log.d("ga", "toas: " + appIsRunning.getCountDown());
+                                    toastMessenger(ctx, "Bạn còn " + (appIsRunning.getCountDown()) + " lần mở ứng dụng");
                                 } else {
-                                    toastMessenger(ctx, "Đây là lần sử dụng ứng dụng cuối cùng");
+                                    if (appIsRunning.getCountDown()==0){
+                                        toastMessenger(ctx, "Đây là lần sử dụng ứng dụng cuối cùng");
+                                    }
                                 }
                             }
                         } else {
+                            //Hết lần mở ứng dụng
                             if (!isOpen) {
                                 toastMessenger(ctx, "Hết lượt mở ứng dụng");
                                 isOpen = true;
@@ -183,19 +200,23 @@ public class MyService extends Service {
                                 default:
                                     break;
                             }
-                            if ((System.currentTimeMillis() - isLimited) >= milestones) {
+                            long timeLastShow = appIsRunning.getTimeLastShow();
+                            if ((System.currentTimeMillis() - timeLastShow) >= milestones) {
                                 switch (appIsRunning.getLevel()) {
                                     case 1:
                                         showNotifyDialogLimited1(ctx);
-                                        isLimited = System.currentTimeMillis();
+                                        appIsRunning.setTimeLastShow(System.currentTimeMillis());
+                                        database.updateToLimitedDatabase(appIsRunning);
                                         break;
                                     case 2:
                                         showNotifyDialogLimited2(ctx);
-                                        isLimited = System.currentTimeMillis();
+                                        appIsRunning.setTimeLastShow(System.currentTimeMillis());
+                                        database.updateToLimitedDatabase(appIsRunning);
                                         break;
                                     case 3:
                                         killApp();
-                                        isLimited = System.currentTimeMillis();
+                                        appIsRunning.setTimeLastShow(System.currentTimeMillis());
+                                        database.updateToLimitedDatabase(appIsRunning);
                                         break;
                                     default:
                                         break;
@@ -204,41 +225,35 @@ public class MyService extends Service {
                         }
 
                     } else {
+                        //Hình thức giới hạn thời gian
+
+                        // Còn thời gian sử dụng và chưa được mở
                         if (appIsRunning.getCountDown() > 0) {
                             if (!isOpen) {
-                                int time = (int) System.currentTimeMillis();
-                                appIsRunning.setTimeIsRun(time);
-                                database.updateToLimitedDatabase(appIsRunning);
                                 isOpen = true;
                                 int timeA = appIsRunning.getCountDown();
                                 timeA /= 1000;
                                 timeA /= 60;
                                 int h = timeA / 60;
                                 int p = timeA % 60;
-                                Log.d(TAG2, "Lan dau mo: " + h + "_" + p);
+                                timeLastShowToast = System.currentTimeMillis();
                                 timeOnRun = System.currentTimeMillis();
-                                timeStart = System.currentTimeMillis();
                                 if (h == 0) {
                                     toastMessenger(ctx, "Bạn còn " + p + " phút sử dụng ứng dụng");
-
                                 } else
                                     toastMessenger(ctx, "Bạn còn " + h + "giờ " + p + " phút sử dụng ứng dụng");
                             } else {
-                                long timeMinus = timeNow - timeOnRun;
-                                long time = appIsRunning.getCountDown() - (int) timeMinus;
-//                                Log.d(TAG2, "Thoi gian con lai: " + time);
+                                long timeMinus = timeNow - timeLastShowToast;
+                                int time = appIsRunning.getCountDown() - (int) timeMinus;
                                 if (time < 5 * 60 * 1000) {
-                                    Log.d(TAG2, "Thoi gian con lai: " + time);
                                     if (timeMinus >= (1 * 60 * 1000)) {
-                                        Log.d(TAG, "handlingService: " + timeMinus);
                                         time /= 1000;
                                         time /= 60;
                                         long h = time / 60;
                                         long p = time % 60;
-
-                                        appIsRunning.setCountDown((int) time);
+                                        appIsRunning.setCountDown(time);
                                         database.updateToLimitedDatabase(appIsRunning);
-                                        timeOnRun = System.currentTimeMillis();
+                                        timeLastShowToast = System.currentTimeMillis();
                                         if (h == 0) {
                                             toastMessenger(ctx, "Bạn còn dưới 1 phút để sử dụng ứng dụng");
 
@@ -252,10 +267,9 @@ public class MyService extends Service {
                                         time /= 60;
                                         long h = time / 60;
                                         long p = time % 60;
-                                        Log.d(TAG2, "time con lai: " + h + "_" + p);
-                                        appIsRunning.setCountDown((int) time);
+                                        appIsRunning.setCountDown(time);
                                         database.updateToLimitedDatabase(appIsRunning);
-                                        timeOnRun = System.currentTimeMillis();
+                                        timeLastShowToast = System.currentTimeMillis();
                                         if (h == 0) {
                                             toastMessenger(ctx, "Bạn còn " + p + " phút sử dụng ứng dụng");
 
@@ -266,11 +280,11 @@ public class MyService extends Service {
 
                             }
                         } else {
+                            //Mở khi hết thời gian
                             if (!isOpen) {
                                 toastMessenger(ctx, "Hết thời gian sử dụng ứng dụng");
                                 isOpen = true;
                             }
-
                             int milestones = 0;
                             switch (appIsRunning.getLevel()) {
                                 case 1:
@@ -285,19 +299,24 @@ public class MyService extends Service {
                                 default:
                                     break;
                             }
-                            if ((System.currentTimeMillis() - isLimited) >= milestones) {
+                            long timeLastShow = appIsRunning.getTimeLastShow();
+                            //Hai lần hiển thị màn hình chặn cách nhau 1 khoảng thời gian nhất định
+                            if ((System.currentTimeMillis() - timeLastShow) >= milestones) {
                                 switch (appIsRunning.getLevel()) {
                                     case 1:
                                         showNotifyDialogLimited1(ctx);
-                                        isLimited = System.currentTimeMillis();
+                                        appIsRunning.setTimeLastShow(System.currentTimeMillis());
+                                        database.updateToLimitedDatabase(appIsRunning);
                                         break;
                                     case 2:
                                         showNotifyDialogLimited2(ctx);
-                                        isLimited = System.currentTimeMillis();
+                                        appIsRunning.setTimeLastShow(System.currentTimeMillis());
+                                        database.updateToLimitedDatabase(appIsRunning);
                                         break;
                                     case 3:
                                         killApp();
-                                        isLimited = System.currentTimeMillis();
+                                        appIsRunning.setTimeLastShow(System.currentTimeMillis());
+                                        database.updateToLimitedDatabase(appIsRunning);
                                         break;
                                     default:
                                         break;
@@ -328,10 +347,10 @@ public class MyService extends Service {
         if (timeNow - timeLastUpdated >= (2 * 60 * 1000)) {
             timeLastUpdated = System.currentTimeMillis();
             for (AppLimited limited : appLimiteds) {
-                if ((int) timeNow > limited.getTimeEnd()) {
-                    int timePlus = limited.getTimeEnd() - limited.getTimeStart();
-                    limited.setTimeStart((int) timeNow);
-                    limited.setTimeEnd((int) timeNow + timePlus);
+                if (timeNow > limited.getTimeEnd()) {
+                    long timePlus = limited.getTimeEnd() - limited.getTimeStart();
+                    limited.setTimeStart(timeNow);
+                    limited.setTimeEnd(timeNow + timePlus);
                     limited.setCountDown(limited.getNumberLimited());
                     database.updateToLimitedDatabase(limited);
                 }
@@ -385,7 +404,6 @@ public class MyService extends Service {
                     @Override
                     public void run() {
                         while (true) {
-
                             ActivityManager manager = (ActivityManager) ctx.getSystemService(ACTIVITY_SERVICE);
                             String temp = "";
                             List<ActivityManager.RunningTaskInfo> runningTaskInfo = manager.getRunningTasks(1);
@@ -395,7 +413,7 @@ public class MyService extends Service {
                                 killApp();
                             }
 
-                            if (notifyLimitedView.isPressButtonBack || notifyLimitedView.isPressButtonHome) {
+                            if (notifyLimitedView.isPressButtonBack ) {
                                 killApp();
                                 return;
                             }
@@ -404,6 +422,7 @@ public class MyService extends Service {
                 };
                 thread.start();
                 windowManager.addView(notifyLimitedView, params);
+                showWmanager1=true;
             }
         });
 
@@ -442,7 +461,7 @@ public class MyService extends Service {
                             if (!rememberPackageName.equals(temp)) {
                                 killApp();
                             }
-                            if (notifyLimitedView.isPressButtonBack || notifyLimitedView.isPressButtonHome) {
+                            if (notifyLimitedView.isPressButtonBack ) {
                                 killApp();
                                 return;
                             }
@@ -451,6 +470,7 @@ public class MyService extends Service {
                 };
                 thread.start();
                 windowManager.addView(notifyLimitedView, params);
+                showWmanager2=true;
             }
         });
     }

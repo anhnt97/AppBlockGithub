@@ -10,17 +10,17 @@ public class AppLimited {
     int countNumeberIsOpen;
     int countTime[] = new int[2];
     String objFinish;
-    int isLimited;
+    int isLimited;  // trạng thái đang chạy hay dừng
     int level;
     int numberLimited;
     int countDown;
-    int timeStart;
-    int timeEnd;
-    int timeIsRun;
+    long timeStart;
+    long timeEnd;
+    long timeLastShow;
 
     public AppLimited(String packageName, int typeIsCountOpen, int countNumeberIsOpen,
-                      int[] countTime, String objFinish, int isLimited, int level,int numberLimited, int countDown,
-                      int timeStart, int timeEnd, int timeIsRun) {
+                      int[] countTime, String objFinish, int isLimited, int level, int numberLimited, int countDown,
+                      long timeStart, long timeEnd, long timeLastShow) {
         this.packageName = packageName;
         this.typeIsCountOpen = typeIsCountOpen;
         this.countNumeberIsOpen = countNumeberIsOpen;
@@ -30,9 +30,9 @@ public class AppLimited {
         this.level = level;
         this.countDown = countDown;
         this.timeStart = timeStart;
-        this.timeIsRun = timeIsRun;
-        this.timeEnd= timeEnd;
-        this.numberLimited= numberLimited;
+        this.timeEnd = timeEnd;
+        this.numberLimited = numberLimited;
+        this.timeLastShow = timeLastShow;
     }
 
     public int getNumberLimited() {
@@ -43,11 +43,11 @@ public class AppLimited {
         this.numberLimited = numberLimited;
     }
 
-    public int getTimeEnd() {
+    public long getTimeEnd() {
         return timeEnd;
     }
 
-    public void setTimeEnd(int timeEnd) {
+    public void setTimeEnd(long timeEnd) {
         this.timeEnd = timeEnd;
     }
 
@@ -59,20 +59,12 @@ public class AppLimited {
         this.countDown = countDown;
     }
 
-    public int getTimeStart() {
+    public long getTimeStart() {
         return timeStart;
     }
 
-    public void setTimeStart(int timeStart) {
+    public void setTimeStart(long timeStart) {
         this.timeStart = timeStart;
-    }
-
-    public int getTimeIsRun() {
-        return timeIsRun;
-    }
-
-    public void setTimeIsRun(int timeIsRun) {
-        this.timeIsRun = timeIsRun;
     }
 
     public int getLevel() {
@@ -129,5 +121,13 @@ public class AppLimited {
 
     public void setLimited(int limited) {
         isLimited = limited;
+    }
+
+    public long getTimeLastShow() {
+        return timeLastShow;
+    }
+
+    public void setTimeLastShow(long timeLastShow) {
+        this.timeLastShow = timeLastShow;
     }
 }

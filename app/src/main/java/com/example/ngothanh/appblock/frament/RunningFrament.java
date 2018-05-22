@@ -59,7 +59,7 @@ public class RunningFrament extends Fragment implements ItemAppAdapter.OnItemCli
     String beforMocGioiHan = "";
     int beforIsChosseSoLan = 0;
     int beforFlagLevel = 0;
-
+    long beforTimeLastShow = 0;
 
     final int[] afterSoLanThietLap = {0};
     final int[] afterSoThoiGianThietLap = new int[2];
@@ -179,7 +179,7 @@ public class RunningFrament extends Fragment implements ItemAppAdapter.OnItemCli
     public void onItemClicked(View itemView, int position, String packageName) {
         Log.d("MyService", "in runnung: " + appLimiteds.get(position).getCountDown());
         ImageView view = iconAppAdapter.getIconApp(position).getImgIconApp();
-        Drawable drawable= view.getDrawable();
+        Drawable drawable = view.getDrawable();
         String appName = iconAppAdapter.getIconApp(position).getTxtAppName();
 
         AppLimited limited = appLimiteds.get(position);
@@ -243,7 +243,7 @@ public class RunningFrament extends Fragment implements ItemAppAdapter.OnItemCli
         loadSettingLimitApp(packageName);
 
         ImageView view = iconAppAdapter.getIconApp(position).getImgIconApp();
-        final Drawable drawable= view.getDrawable();
+        final Drawable drawable = view.getDrawable();
 
         final Dialog dialog = new Dialog(getActivity());
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
@@ -311,6 +311,7 @@ public class RunningFrament extends Fragment implements ItemAppAdapter.OnItemCli
                 beforMocGioiHan = limited.getObjFinish();
                 afterFlagLevel = limited.getLevel();
                 beforFlagLevel = limited.getLevel();
+                beforTimeLastShow = limited.getTimeLastShow();
                 break;
             }
         }
@@ -379,9 +380,9 @@ public class RunningFrament extends Fragment implements ItemAppAdapter.OnItemCli
         } else {
             limited.setLimited(1);
             view2.setImageResource(R.drawable.icon_pause);
-            int timePlus = limited.getTimeEnd() - limited.getTimeStart();
-            int timeStart = (int) System.currentTimeMillis();
-            int timeEnd = timeStart + timePlus;
+            long timePlus = limited.getTimeEnd() - limited.getTimeStart();
+            long timeStart = System.currentTimeMillis();
+            long timeEnd = timeStart + timePlus;
             int counDown = limited.getNumberLimited();
             limited.setTimeStart(timeStart);
             limited.setTimeEnd(timeEnd);
@@ -844,7 +845,7 @@ public class RunningFrament extends Fragment implements ItemAppAdapter.OnItemCli
 
                             int numberLimited = countDown;
                             int timeStart = (int) System.currentTimeMillis();
-                            int timeEnd = timeStart;
+                            int timeEnd = 0;
                             if (afterFlagChonMocGioiHan[0].equals("giờ")) {
                                 timeEnd = timeStart + (60 * 60 * 1000);
                             }
@@ -854,8 +855,7 @@ public class RunningFrament extends Fragment implements ItemAppAdapter.OnItemCli
                             if (afterFlagChonMocGioiHan[0].equals("tuần")) {
                                 timeEnd = timeStart + (7 * 24 * 60 * 60 * 1000);
                             }
-                            int timeRun = 0;
-
+                            long timeLastShow = beforTimeLastShow;
                             AppLimited limited = new AppLimited(packageName,
                                     afterIsChosseSoLan[0],
                                     afterSoLanThietLap[0],
@@ -864,7 +864,7 @@ public class RunningFrament extends Fragment implements ItemAppAdapter.OnItemCli
                                     1,
                                     afterFlagLevel,
                                     numberLimited,
-                                    countDown, timeStart, timeEnd, timeRun);
+                                    countDown, timeStart, timeEnd, timeLastShow);
                             Database database = new Database(context);
                             database.updateToLimitedDatabase(limited);
                             apps.clear();
