@@ -1,13 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
     android:id="@+id/layout_wd_manager_2"
-    android:layout_height="match_parent"
-    >
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
 
     <LinearLayout
-        android:id="@+id/rlt_layout_about_in_wdmanager_2"
+        android:id="@+id/lin_layout_about_in_wdmanager_2"
         android:layout_width="match_parent"
         android:layout_height="38dp"
         android:layout_marginLeft="16dp"
@@ -20,8 +19,7 @@
             android:layout_width="30dp"
             android:layout_height="30dp"
             android:layout_gravity="center_vertical"
-            android:layout_marginLeft="4dp"
-            />
+            android:layout_marginLeft="4dp" />
 
         <TextView
             android:id="@+id/textView2"
@@ -29,17 +27,17 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
-            android:layout_marginStart="16dp"
+            android:layout_marginLeft="8dp"
             android:text="Thông báo giới hạn"
             android:textColor="#163491"
             android:textSize="22sp" />
     </LinearLayout>
 
     <LinearLayout
-        android:id="@+id/rlt_layout_messenger_in_wdmanager_2"
+        android:id="@+id/rlt_layout_messenge_in_wdmanager_2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/rlt_layout_about_in_wdmanager_2"
+        android:layout_below="@+id/lin_layout_about_in_wdmanager_2"
         android:layout_marginLeft="16dp"
         android:layout_marginRight="16dp"
         android:layout_marginTop="8dp"
@@ -50,7 +48,7 @@
             style="@style/TextValue"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="8dp"
+            android:layout_marginLeft="12dp"
             android:layout_marginRight="8dp"
             android:layout_marginTop="6dp"
             android:text="Bạn đã sử dụng ứng dụng vượt quá thiết lập giới hạn.
@@ -59,20 +57,20 @@ Vui lòng nhập lại đoạn mã sau để tiếp tục sử dụng ứng dụ
             android:textSize="19sp" />
 
         <TextView
-            android:textStyle="bold"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
             android:layout_marginBottom="8dp"
-            android:textSize="12sp"
             android:text="Lưu ý có phân biệt chữ hoa chữ thường !"
-            android:textColor="#ff1e35" />
+            android:textColor="#ff1e35"
+            android:textSize="12sp"
+            android:textStyle="bold" />
     </LinearLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/rlt_layout_messenger_in_wdmanager_2"
+        android:layout_below="@id/rlt_layout_messenge_in_wdmanager_2"
         android:layout_marginLeft="16dp"
         android:layout_marginRight="16dp"
         android:layout_marginTop="8dp"
@@ -103,8 +101,8 @@ Vui lòng nhập lại đoạn mã sau để tiếp tục sử dụng ứng dụ
             android:layout_height="wrap_content"
             android:background="@drawable/btn_in_window_manager"
             android:paddingBottom="2dp"
-            android:paddingLeft="8dp"
-            android:paddingRight="8dp"
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp"
             android:paddingTop="2dp"
             android:text=""
             android:textColor="#163491"
@@ -116,13 +114,17 @@ Vui lòng nhập lại đoạn mã sau để tiếp tục sử dụng ứng dụ
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_above="@id/rlt_layout_btn_wdmanager_1"
-        android:layout_marginBottom="2dp"
+        android:layout_above="@id/rlt_layout_btn_wdmanager_2"
+        android:layout_marginBottom="6dp"
         android:layout_marginLeft="16dp"
         android:layout_marginRight="16dp"
         android:background="#87e8efef"
         android:orientation="vertical"
-        android:padding="8dp">
+        android:paddingLeft="6dp"
+        android:paddingRight="6dp"
+        android:paddingTop="4dp"
+        android:paddingBottom="4dp"
+        >
 
         <TextView
             android:id="@+id/txt_locution_value_wdm2"
@@ -151,7 +153,7 @@ Vui lòng nhập lại đoạn mã sau để tiếp tục sử dụng ứng dụ
 
 
     <LinearLayout
-        android:id="@+id/rlt_layout_btn_wdmanager_1"
+        android:id="@+id/rlt_layout_btn_wdmanager_2"
         android:layout_width="match_parent"
         android:layout_height="30dp"
         android:layout_alignParentBottom="true"

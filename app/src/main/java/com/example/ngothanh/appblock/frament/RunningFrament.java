@@ -7,6 +7,7 @@ import android.content.DialogInterface;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
+import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -16,6 +17,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
@@ -35,6 +37,7 @@ import com.example.ngothanh.appblock.sqlite.Database;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.ConcurrentModificationException;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
@@ -53,6 +56,7 @@ public class RunningFrament extends Fragment implements ItemAppAdapter.OnItemCli
     private List<ApplicationInfo> applicationInfos = new ArrayList<>();
     private PackageManager packageManager;
     int flagLastChossse = 0;
+    private int tempCountOnTouch = 0;
 
     int beforSoLanThietLap = 0;
     int[] beforSoTHoiGianThietLap = new int[2];
@@ -71,9 +75,13 @@ public class RunningFrament extends Fragment implements ItemAppAdapter.OnItemCli
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        updateListDatabase();
+    }
 
     @Nullable
     @Override
@@ -175,40 +183,86 @@ public class RunningFrament extends Fragment implements ItemAppAdapter.OnItemCli
         });
     }
 
+    private void updateListDatabase() {
+        Database database = new Database(context);
+        try {
+            appLimiteds = database.getListAppIsLimited();
+            for (AppLimited limited : appLimiteds) {
+                if (limited.isLimited() == 0) {
+                    appLimiteds.remove(limited);
+                }
+            }
+        } catch (ConcurrentModificationException e) {
+            e.printStackTrace();
+        }
+        //Cập nhật thời gian cho 1 chu trình kiểm tra mới
+        for (AppLimited limited : appLimiteds) {
+            if (System.currentTimeMillis() > limited.getTimeEnd()) {
+                long timePlus = limited.getTimeEnd() - limited.getTimeStart();
+                limited.setTimeStart(System.currentTimeMillis());
+                limited.setTimeEnd(System.currentTimeMillis() + timePlus);
+                limited.setCountDown(limited.getNumberLimited());
+                database.updateToLimitedDatabase(limited);
+            }
+        }
+    }
+
+
     @Override
     public void onItemClicked(View itemView, int position, String packageName) {
+//        updateListDatabase();
         Log.d("MyService", "in runnung: " + appLimiteds.get(position).getCountDown());
         ImageView view = iconAppAdapter.getIconApp(position).getImgIconApp();
         Drawable drawable = view.getDrawable();
         String appName = iconAppAdapter.getIconApp(position).getTxtAppName();
 
-        AppLimited limited = appLimiteds.get(position);
+        String valuePackage = apps.get(position).getPackageName();
+        AppLimited limited = null;
+        for (AppLimited appLimited : appLimiteds) {
+            if (appLimited.getPackageName().equals(valuePackage)) {
+                limited = appLimited;
+                break;
+            }
+        }
+
         int type = limited.isTypeIsCountOpen();
         int level = limited.getLevel();
         String mocGioiHan = limited.getObjFinish();
+        int countDown = limited.getCountDown();//mili giây
+        int h = 0, seconds = 0, m = 0;
+        if (type == 0) {
+            countDown /= 1000; // giây
+            int temp = countDown / 60;  // phút
+            m = temp % 60;
+            h = temp / 60; //giờ
+            seconds = countDown % 60;    // giây(lẻ)
+
+        }
+
         Dialog dialog = new Dialog(context);
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
         dialog.setContentView(R.layout.dialog_about_limited);
 
         TextView setAppName = dialog.findViewById(R.id.txt_app_name_about);
         ImageView iconApp = dialog.findViewById(R.id.img_icon_app_about);
-        TextView setkieuGioiHan = dialog.findViewById(R.id.txt_set_kieu_gioi_han_about);
+        TextView txtKieuGioiHan = dialog.findViewById(R.id.txt_set_kieu_gioi_han_about);
         TextView txtHinhThucGioiHan = dialog.findViewById(R.id.txt_hinh_thuc_gioi_han_about);
         TextView txtSetThoiLuongGioiHan = dialog.findViewById(R.id.txt_set_thoi_luong_gioi_han_about);
         TextView txtSetMocGioiHan = dialog.findViewById(R.id.txt_set_moc_theo_doi_gioi_han_about);
         TextView txtSetLevel = dialog.findViewById(R.id.txt_set_level_about);
         TextView txtStatus = dialog.findViewById(R.id.txt_set_status_about);
+        TextView txtCountDown = dialog.findViewById(R.id.txt_set_count_down_about);
 
         setAppName.setText(appName);
         iconApp.setImageDrawable(drawable);
         if (type == 1) {
-            setkieuGioiHan.setText("Số lần mở");
-            txtHinhThucGioiHan.setText("Số lần cài đặt");
+            txtKieuGioiHan.setText("Số lần mở");
+            txtHinhThucGioiHan.setText("Số lần cài đặt:");
             txtSetThoiLuongGioiHan.setText(String.valueOf(limited.getCountNumeberIsOpen()));
 
         } else {
-            setkieuGioiHan.setText("Thời gian sử dụng:");
-            txtHinhThucGioiHan.setText("Thời gian cài đặt:");
+            txtKieuGioiHan.setText("Thời gian sử dụng");
+            txtHinhThucGioiHan.setText("Thời gian thiết lập:");
             int[] a = limited.getCountTime();
             txtSetThoiLuongGioiHan.setText(a[0] + " giờ " + a[1] + " phút");
         }
@@ -232,7 +286,31 @@ public class RunningFrament extends Fragment implements ItemAppAdapter.OnItemCli
             txtStatus.setText("Đang chạy");
         } else
             txtStatus.setText("Tạm dừng");
-
+        String valueCountDown = "";
+        if (countDown <= 0) {
+            valueCountDown = "Vượt giới hạn";
+        } else {
+            if (type == 1) {
+                if (countDown > 0) {
+                    valueCountDown += String.valueOf(countDown) + " lần mở";
+                }
+            } else {
+                if (h != 0) {
+                    valueCountDown += String.valueOf(h) + " giờ, ";
+                    valueCountDown += String.valueOf(m) + " phút";
+                } else {
+                    if (m != 0) {
+                        valueCountDown += String.valueOf(m) + " phút, ";
+                        valueCountDown += String.valueOf(seconds) + " giây";
+                    } else {
+                        if (seconds > 0) {
+                            valueCountDown += String.valueOf(seconds) + " giây";
+                        }
+                    }
+                }
+            }
+        }
+        txtCountDown.setText(valueCountDown);
         dialog.show();
 
     }
@@ -240,11 +318,82 @@ public class RunningFrament extends Fragment implements ItemAppAdapter.OnItemCli
 
     @Override
     public void onItemLongClick(View itemView, final int position, final String packageName) {
+//        updateListDatabase();
         loadSettingLimitApp(packageName);
-
         ImageView view = iconAppAdapter.getIconApp(position).getImgIconApp();
         final Drawable drawable = view.getDrawable();
 
+        String valuePackage = apps.get(position).getPackageName();
+        AppLimited limited = null;
+        for (AppLimited appLimited : appLimiteds) {
+            if (appLimited.getPackageName().equals(valuePackage)) {
+                limited = appLimited;
+                break;
+            }
+        }
+
+        if (limited.getCountDown() < 0) {
+            Log.d("ga", "onItemLongClick: ");
+            final Dialog dialogfather = new Dialog(getActivity());
+            dialogfather.requestWindowFeature(Window.FEATURE_NO_TITLE);
+            dialogfather.setContentView(R.layout.dialog_stop_change_limit);
+
+            final ImageView imgIconApp = dialogfather.findViewById(R.id.img_icon_app_in_dialog_stop_change_limited);
+            imgIconApp.setImageDrawable(drawable);
+
+            Typeface type = Typeface.createFromAsset(context.getAssets(), "LBRITEDI.TTF");
+            final TextView txtSystemValue = dialogfather.findViewById(R.id.txt_system_value_in_dialog_stop_change_limited);
+            String s = "";
+            Random random = new Random();
+            int length = 35;
+            Log.d("ga", "onItemLongClick: s ");
+            for (int i = 0; i < length; i++) {
+                int a = 48 + random.nextInt((122 - 48));
+                if (a >= 58 && a <= 64 || a >= 91 && a <= 96) {
+                    length++;
+                } else {
+                    s += (char) a;
+                }
+            }
+            txtSystemValue.setText(s);
+            txtSystemValue.setTypeface(type);
+
+            final EditText edtPersonValue = dialogfather.findViewById(R.id.edt_person_value_in_dialog_stop_change_limited);
+            edtPersonValue.setText("");
+            edtPersonValue.setTypeface(type);
+
+            TextView btnBack = dialogfather.findViewById(R.id.btn_back_in_dialog_stop_change_limited);
+            TextView btnContinue = dialogfather.findViewById(R.id.btn_continue_in_dialog_stop_change_limited);
+            View.OnClickListener listener = new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    switch (v.getId()) {
+                        case R.id.btn_back_in_dialog_stop_change_limited:
+                            dialogfather.dismiss();
+                            break;
+                        case R.id.btn_continue_in_dialog_stop_change_limited:
+                            Log.d("ga", edtPersonValue.getText().toString() + "_" + txtSystemValue.getText().toString());
+                            if (edtPersonValue.getText().toString().equals(txtSystemValue.getText().toString())) {
+                                showDialogChange(drawable, position, packageName);
+                                dialogfather.dismiss();
+                            } else {
+                                Toast.makeText(context, "Mã xác nhận chưa đúng.", Toast.LENGTH_SHORT).show();
+                            }
+                            break;
+                        default:
+                            break;
+                    }
+                }
+            };
+            btnBack.setOnClickListener(listener);
+            btnContinue.setOnClickListener(listener);
+            dialogfather.show();
+        } else {
+            showDialogChange(drawable, position, packageName);
+        }
+    }
+
+    private void showDialogChange(final Drawable drawable, final int position, final String packageName) {
         final Dialog dialog = new Dialog(getActivity());
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
         dialog.setContentView(R.layout.dialog_long_click_running);
@@ -292,7 +441,6 @@ public class RunningFrament extends Fragment implements ItemAppAdapter.OnItemCli
         btnSua.setOnClickListener(onClickListener);
         btnXoa.setOnClickListener(onClickListener);
         dialog.show();
-
     }
 
     private void loadSettingLimitApp(String packageName) {
@@ -318,19 +466,30 @@ public class RunningFrament extends Fragment implements ItemAppAdapter.OnItemCli
     }
 
     @Override
-    public void onImageStatusClicked(int position, String packageName) {
-        final AppLimited limited = appLimiteds.get(position);
-        Database database = new Database(context);
-        final ImageView view2 = new ImageView(context);
-        if (limited.isLimited() == 1) {
-            if (limited.getCountDown() <= 0) {
-                final Dialog dialog = new Dialog(context);
-                dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-                dialog.setContentView(R.layout.windows_manager_dialog_level_2);
+    public void onImageStatusClicked(final int position, String packageName) {
+//        updateListDatabase();
+        final Database database = new Database(context);
+        ImageView view = iconAppAdapter.getIconApp(position).getImgIconApp();
 
+        final Drawable drawable = view.getDrawable();
+        final ImageView imageView = new ImageView(context);
+
+        final AppLimited appLimited = appLimiteds.get(position);
+        if (appLimited.isLimited() == 1) {
+            if (appLimited.getCountDown() < 0) {
+                final Dialog dialogfather = new Dialog(getActivity());
+                dialogfather.requestWindowFeature(Window.FEATURE_NO_TITLE);
+                dialogfather.setContentView(R.layout.dialog_stop_change_limit);
+//
+                final ImageView imgIconApp = dialogfather.findViewById(R.id.img_icon_app_in_dialog_stop_change_limited);
+                imgIconApp.setImageDrawable(drawable);
+//
+                Typeface type = Typeface.createFromAsset(context.getAssets(), "LBRITEDI.TTF");
+//
+                final TextView txtSystemValue = dialogfather.findViewById(R.id.txt_system_value_in_dialog_stop_change_limited);
                 String s = "";
                 Random random = new Random();
-                int length = 40;
+                int length = 35;
                 for (int i = 0; i < length; i++) {
                     int a = 48 + random.nextInt((122 - 48));
                     if (a >= 58 && a <= 64 || a >= 91 && a <= 96) {
@@ -339,29 +498,33 @@ public class RunningFrament extends Fragment implements ItemAppAdapter.OnItemCli
                         s += (char) a;
                     }
                 }
-                final TextView txtSystemValue = dialog.findViewById(R.id.txt_system_value);
                 txtSystemValue.setText(s);
-                final EditText edtPersionValue = dialog.findViewById(R.id.edt_person_value);
-                final TextView btnBack = dialog.findViewById(R.id.btn_thoat_thong_bao_gioi_han_2);
-                btnBack.setText("Trở về");
-                TextView btnOk = dialog.findViewById(R.id.btn_ok_thong_bao_gioi_han_2);
-
-                View.OnClickListener onClickListener = new View.OnClickListener() {
+                txtSystemValue.setTypeface(type);
+//
+                final EditText edtPersonValue = dialogfather.findViewById(R.id.edt_person_value_in_dialog_stop_change_limited);
+                edtPersonValue.setText("");
+                edtPersonValue.setTypeface(type);
+//
+                TextView btnBack = dialogfather.findViewById(R.id.btn_back_in_dialog_stop_change_limited);
+                TextView btnContinue = dialogfather.findViewById(R.id.btn_continue_in_dialog_stop_change_limited);
+//
+                View.OnClickListener listener = new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
                         switch (v.getId()) {
-                            case R.id.btn_thoat_thong_bao_gioi_han_2:
-                                dialog.dismiss();
+                            case R.id.btn_back_in_dialog_stop_change_limited:
+                                dialogfather.dismiss();
                                 break;
-                            case R.id.btn_ok_thong_bao_gioi_han_2:
-                                if (txtSystemValue.getText().toString()
-                                        .equals(edtPersionValue.getText().toString())) {
-                                    dialog.dismiss();
-                                    limited.setLimited(0);
-                                    view2.setImageResource(R.drawable.icon_pause);
+                            case R.id.btn_continue_in_dialog_stop_change_limited:
+                                if (edtPersonValue.getText().toString().equals(txtSystemValue.getText().toString())) {
+                                    appLimited.setLimited(0);
+                                    imageView.setImageResource(R.drawable.icon_play);
+                                    database.updateToLimitedDatabase(appLimited);
+                                    iconAppAdapter.getIconApp(position).setImgStatus(imageView);
+                                    iconAppAdapter.notifyItemChanged(position);
+                                    dialogfather.dismiss();
                                 } else {
-                                    Toast.makeText(context, "Mã xác nhận không đúng",
-                                            Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(context, "Mã xác nhận chưa đúng.", Toast.LENGTH_LONG).show();
                                 }
                                 break;
                             default:
@@ -369,28 +532,31 @@ public class RunningFrament extends Fragment implements ItemAppAdapter.OnItemCli
                         }
                     }
                 };
-                btnBack.setOnClickListener(onClickListener);
-                btnOk.setOnClickListener(onClickListener);
-                dialog.show();
+                btnBack.setOnClickListener(listener);
+                btnContinue.setOnClickListener(listener);
+                dialogfather.show();
             } else {
-                Log.d("abcgg", "onImageStatusClicked: THay ddoi");
-                limited.setLimited(0);
-                view2.setImageResource(R.drawable.icon_play);
+                appLimited.setLimited(0);
+                imageView.setImageResource(R.drawable.icon_play);
+                iconAppAdapter.getIconApp(position).setImgStatus(imageView);
+                iconAppAdapter.notifyItemChanged(position);
+                database.updateToLimitedDatabase(appLimited);
             }
         } else {
-            limited.setLimited(1);
-            view2.setImageResource(R.drawable.icon_pause);
-            long timePlus = limited.getTimeEnd() - limited.getTimeStart();
+            imageView.setImageResource(R.drawable.icon_pause);
+            long timePlus = appLimited.getTimeEnd() - appLimited.getTimeStart();
             long timeStart = System.currentTimeMillis();
             long timeEnd = timeStart + timePlus;
-            int counDown = limited.getNumberLimited();
-            limited.setTimeStart(timeStart);
-            limited.setTimeEnd(timeEnd);
-            limited.setCountDown(counDown);
+            int counDown = appLimited.getNumberLimited();
+            appLimited.setLimited(1);
+            appLimited.setTimeStart(timeStart);
+            appLimited.setTimeEnd(timeEnd);
+            appLimited.setCountDown(counDown);
+            iconAppAdapter.getIconApp(position).setImgStatus(imageView);
+            iconAppAdapter.notifyItemChanged(position);
+            database.updateToLimitedDatabase(appLimited);
         }
-        iconAppAdapter.getIconApp(position).setImgStatus(view2);
-        iconAppAdapter.notifyItemChanged(position);
-        database.updateToLimitedDatabase(limited);
+
     }
 
     private void showDialogThietLapGioiHan1(final int positionClick, final Drawable drawable, final String packageName) {
@@ -656,8 +822,8 @@ public class RunningFrament extends Fragment implements ItemAppAdapter.OnItemCli
                                 showDialogLoi("Xin vui lòng kiểm tra lại thiết lập giới hạn!");
                             } else {
                                 //Todo
-                                showDialogThietLapGioiHan2(positionClick, drawable, packageName);
-                                dialog.dismiss();
+                                showDialogThietLapGioiHan2(dialog, drawable, packageName);
+                                dialog.hide();
                             }
                         } else {
                             afterSoThoiGianThietLap[0] = Integer.parseInt(edtSoGioThoiGian
@@ -680,24 +846,24 @@ public class RunningFrament extends Fragment implements ItemAppAdapter.OnItemCli
                                         if (afterSoThoiGianThietLap[0] >= 1) {
                                             showDialogLoi("Xin vui lòng kiểm tra lại thiết lập giới hạn!");
                                         } else {
-                                            showDialogThietLapGioiHan2(positionClick, drawable, packageName);
-                                            dialog.dismiss();
+                                            showDialogThietLapGioiHan2(dialog, drawable, packageName);
+                                            dialog.hide();
                                         }
                                     }
                                     if (afterFlagChonMocGioiHan[0].equals("ngày")) {
                                         if (afterSoThoiGianThietLap[0] >= 24) {
                                             showDialogLoi("Xin vui lòng kiểm tra lại thiết lập giới hạn!");
                                         } else {
-                                            showDialogThietLapGioiHan2(positionClick, drawable, packageName);
-                                            dialog.dismiss();
+                                            showDialogThietLapGioiHan2(dialog, drawable, packageName);
+                                            dialog.hide();
                                         }
                                     }
                                     if (afterFlagChonMocGioiHan[0].equals("tuần")) {
                                         if ((afterSoThoiGianThietLap[0] >= 168)) {
                                             showDialogLoi("Xin vui lòng kiểm tra lại thiết lập giới hạn!");
                                         } else {
-                                            showDialogThietLapGioiHan2(positionClick, drawable, packageName);
-                                            dialog.dismiss();
+                                            showDialogThietLapGioiHan2(dialog, drawable, packageName);
+                                            dialog.hide();
                                         }
                                     }
                                 }
@@ -709,18 +875,121 @@ public class RunningFrament extends Fragment implements ItemAppAdapter.OnItemCli
                 }
             }
         };
+
+        View.OnTouchListener onTouchListener = new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                switch (v.getId()) {
+                    case R.id.btn_tang_so_lan:
+                        tempCountOnTouch++;
+                        if (tempCountOnTouch % 11 == 0) {
+                            int tempOpen = Integer.parseInt(edtSoLanMo.getText().toString());
+                            if (tempOpen > 99) {
+                                edtSoLanMo.setTextSize(18);
+                            }
+                            edtSoLanMo.setText(String.valueOf(tempOpen + 1));
+                            tempCountOnTouch = 0;
+                        }
+                        break;
+                    case R.id.btn_giam_so_lan:
+                        tempCountOnTouch++;
+                        if (tempCountOnTouch % 11 == 0) {
+                            int tempOpen = Integer.parseInt(edtSoLanMo.getText().toString());
+                            if (tempOpen > 0) {
+                                if (tempOpen <= 99) {
+                                    edtSoLanMo.setTextSize(20);
+                                }
+                                edtSoLanMo.setText(String.valueOf(tempOpen - 1));
+                            }
+                            tempCountOnTouch = 0;
+                        }
+                        break;
+                    case R.id.btn_tang_gio_thoi_gian:
+                        tempCountOnTouch++;
+                        if (tempCountOnTouch % 11 == 0) {
+                            int c = Integer.parseInt(edtSoGioThoiGian.getText().toString());
+                            c++;
+                            if (c > 99) {
+                                edtSoGioThoiGian.setTextSize(13);
+                            }
+                            edtSoGioThoiGian.setText(String.valueOf(c));
+                            tempCountOnTouch = 0;
+                        }
+                        break;
+                    case R.id.btn_giam_gio_thoi_gian:
+                        tempCountOnTouch++;
+                        if (tempCountOnTouch % 11 == 0) {
+                            int d = Integer.parseInt(edtSoGioThoiGian.getText().toString());
+                            if (d > 0) {
+                                d--;
+                            }
+                            if (d > 99) {
+                                edtSoGioThoiGian.setTextSize(13);
+                            }
+                            if (d <= 99) {
+                                edtSoGioThoiGian.setTextSize(16);
+                            }
+                            edtSoGioThoiGian.setText(String.valueOf(d));
+                            tempCountOnTouch = 0;
+                        }
+                        break;
+                    case R.id.btn_tang_phut_thoi_gian:
+                        tempCountOnTouch++;
+                        if (tempCountOnTouch % 11 == 0) {
+                            int e = Integer.parseInt(edtSoPhutThoiGian.getText().toString());
+                            e++;
+                            edtSoPhutThoiGian.setText(String.valueOf(e));
+                            if (e == 60) {
+                                int p = Integer.parseInt(edtSoGioThoiGian.getText().toString());
+                                p++;
+                                e = 0;
+                                edtSoGioThoiGian.setText(String.valueOf(p));
+                                edtSoPhutThoiGian.setText(String.valueOf(e));
+                            }
+                            tempCountOnTouch = 0;
+                        }
+                        break;
+                    case R.id.btn_giam_phut_thoi_gian:
+                        tempCountOnTouch++;
+                        if (tempCountOnTouch % 11 == 0) {
+                            int f = Integer.parseInt(edtSoPhutThoiGian.getText().toString());
+                            if (f == 0) {
+                                int p = Integer.parseInt(edtSoGioThoiGian.getText().toString());
+                                if (p > 0) {
+                                    p--;
+                                }
+                                f = 59;
+                                edtSoGioThoiGian.setText(String.valueOf(p));
+                                edtSoPhutThoiGian.setText(String.valueOf(f));
+                            } else f--;
+                            edtSoPhutThoiGian.setText(String.valueOf(f));
+                            tempCountOnTouch = 0;
+                        }
+                        break;
+                    default:
+                        break;
+                }
+                return false;
+            }
+        };
         btnChonSoLan.setOnClickListener(onClickListener);
         btnTangSoLan.setOnClickListener(onClickListener);
+        btnTangSoLan.setOnTouchListener(onTouchListener);
         btnGiamSoLan.setOnClickListener(onClickListener);
+        btnGiamSoLan.setOnTouchListener(onTouchListener);
         btnChonGioSoLan.setOnClickListener(onClickListener);
         btnChonNgaySoLan.setOnClickListener(onClickListener);
         btnChonTuanSoLan.setOnClickListener(onClickListener);
 
         btnChonThoiGian.setOnClickListener(onClickListener);
         btnTangGioThoiGian.setOnClickListener(onClickListener);
+        btnTangGioThoiGian.setOnTouchListener(onTouchListener);
         btnGiamGioThoiGian.setOnClickListener(onClickListener);
+        btnGiamGioThoiGian.setOnTouchListener(onTouchListener);
         btnTangPhutThoiGian.setOnClickListener(onClickListener);
+        btnTangPhutThoiGian.setOnTouchListener(onTouchListener);
         btnGiamPhutThoiGian.setOnClickListener(onClickListener);
+        btnGiamPhutThoiGian.setOnTouchListener(onTouchListener);
         btnChonGioThoiGian.setOnClickListener(onClickListener);
         btnChonNgayThoiGian.setOnClickListener(onClickListener);
         btnChonTuanThoiGian.setOnClickListener(onClickListener);
@@ -731,7 +1000,6 @@ public class RunningFrament extends Fragment implements ItemAppAdapter.OnItemCli
         dialog.show();
 
     }
-
 
     private void showDialogLoi(String s) {
         final Dialog dialog1 = new Dialog(getActivity());
@@ -752,7 +1020,7 @@ public class RunningFrament extends Fragment implements ItemAppAdapter.OnItemCli
         dialog1.show();
     }
 
-    private void showDialogThietLapGioiHan2(final int positionClick, final Drawable drawable, final String packageName) {
+    private void showDialogThietLapGioiHan2(final Dialog dialog1, final Drawable drawable, final String packageName) {
         final Dialog dialog = new Dialog(getActivity());
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
         dialog.setContentView(R.layout.dialog_thiet_lap_gioi_han_2);
@@ -823,6 +1091,7 @@ public class RunningFrament extends Fragment implements ItemAppAdapter.OnItemCli
                         break;
                     case R.id.btn_tro_ve_thiet_lap_2:
                         dialog.dismiss();
+                        dialog1.show();
 //                        showDialogThietLapGioiHan1(positionClick, bitmapIconApp, packageName);
                         break;
                     case R.id.btn_tao_thiet_lap_2:
@@ -888,8 +1157,14 @@ public class RunningFrament extends Fragment implements ItemAppAdapter.OnItemCli
         btnChonLevelCuongQuyet.setOnClickListener(onClickListener);
         btnTroVe.setOnClickListener(onClickListener);
         btnTao.setOnClickListener(onClickListener);
+        dialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
+            @Override
+            public void onCancel(DialogInterface dialog) {
+                dialog.dismiss();
+                dialog1.show();
+            }
+        });
         dialog.show();
-
     }
 
 }

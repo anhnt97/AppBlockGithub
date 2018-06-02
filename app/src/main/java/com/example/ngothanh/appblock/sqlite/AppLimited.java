@@ -6,17 +6,17 @@ package com.example.ngothanh.appblock.sqlite;
 
 public class AppLimited {
     String packageName;
-    int typeIsCountOpen;
-    int countNumeberIsOpen;
-    int countTime[] = new int[2];
-    String objFinish;
+    int typeIsCountOpen;    // Cờ kiểm tra Kiểu gới hạn là số lần mở (=1) hoặc thời gian sử dụng (=0)
+    int countNumeberIsOpen; // Số lần mở được thiết lập
+    int countTime[] = new int[2];   // giờ và phút thiết lập giới hạn
+    String objFinish;   // Chu kỳ giới hạn
     int isLimited;  // trạng thái đang chạy hay dừng
-    int level;
-    int numberLimited;
-    int countDown;
-    long timeStart;
-    long timeEnd;
-    long timeLastShow;
+    int level;  // Cấp độ giới hạn
+    int numberLimited;// Nhớ số cài đặt giới hạn được thiết lập. nhằm cho mục đích update
+    int countDown;  // Đếm số lượng giới hạn còn lại
+    long timeStart; //Thời gia bắt đầu chu kỳ giới hạn
+    long timeEnd;   //Thời gian kết thúc chu kỳ giới hạn
+    long timeLastShow;  // Thời gian hiện windowManager nhắc nhở lần cuối
 
     public AppLimited(String packageName, int typeIsCountOpen, int countNumeberIsOpen,
                       int[] countTime, String objFinish, int isLimited, int level, int numberLimited, int countDown,

@@ -33,7 +33,6 @@
             android:id="@+id/img_status"
             android:layout_width="25dp"
             android:layout_height="25dp"
-            android:background="@drawable/icon_lock"
             android:layout_alignParentEnd="true"
             android:layout_centerVertical="true" />
 

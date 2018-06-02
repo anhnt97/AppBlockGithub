@@ -45,11 +45,21 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         limitFrament = new LimitFrament();
         runningFrament = new RunningFrament();
         securityFrament = new SecurityFrament();
-        startService(new Intent(getBaseContext(), MyService.class));
         showLimitFrament();
         isFist = true;
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        stopService(new Intent(getBaseContext(), MyService.class));
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        startService(new Intent(getBaseContext(), MyService.class));
+    }
 
     private void initializeComponents() {
         final Handler handler = new Handler(Looper.getMainLooper());
@@ -149,7 +159,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     public void requestPermissions() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            String[] permissions = new String[] {
+            String[] permissions = new String[]{
                     Manifest.permission.ACCESS_COARSE_LOCATION,
                     Manifest.permission.ACCESS_FINE_LOCATION,
                     Manifest.permission.READ_EXTERNAL_STORAGE,

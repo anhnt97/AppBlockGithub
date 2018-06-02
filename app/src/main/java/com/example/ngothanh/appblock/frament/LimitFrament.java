@@ -2,6 +2,7 @@ package com.example.ngothanh.appblock.frament;
 
 import android.app.Dialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.graphics.drawable.Drawable;
@@ -13,6 +14,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
@@ -45,6 +47,7 @@ public class LimitFrament extends Fragment implements ItemAppAdapter.OnItemClick
     private RecyclerView rcvApps;
     private List<ItemApp> apps;
     private ItemAppAdapter iconAppAdapter;
+    private int tempCount;
 
 
     private int flagSelect = 0;
@@ -155,9 +158,8 @@ public class LimitFrament extends Fragment implements ItemAppAdapter.OnItemClick
     public void onItemClicked(View itemView, int position, String packageName) {
         ImageView view = iconAppAdapter.getIconApp(position).getImgIconApp();
         Drawable drawable = view.getDrawable();
-//        BitmapDrawable drawableIcon = (BitmapDrawable) view.getDrawable();
-//        Bitmap bitmapIcon = drawableIcon.getBitmap();
-        showDialogLuaChon(drawable, packageName);
+
+        showDialogLuaChon(position, drawable, packageName);
     }
 
     @Override
@@ -169,11 +171,11 @@ public class LimitFrament extends Fragment implements ItemAppAdapter.OnItemClick
     public void onImageStatusClicked(int position, String packageName) {
         ImageView view = iconAppAdapter.getIconApp(position).getImgIconApp();
         Drawable drawable = view.getDrawable();
-        showDialogLuaChon(drawable, packageName);
+        showDialogLuaChon(position, drawable, packageName);
     }
 
 
-    private void showDialogLuaChon(final Drawable drawable, final String packageName) {
+    private void showDialogLuaChon(final int position, final Drawable drawable, final String packageName) {
         final Dialog dialog = new Dialog(context);
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
         dialog.setContentView(R.layout.dialog_lua_chon_gioi_han);
@@ -202,7 +204,7 @@ public class LimitFrament extends Fragment implements ItemAppAdapter.OnItemClick
                         } else if (flagSelect == -1) {
                             dialog.dismiss();
                             Log.d(TAG, "sau click");
-                            showDialogThietLapGioiHan1(drawable, packageName);
+                            showDialogThietLapGioiHan1(position, drawable, packageName);
                         }
                         break;
                     case R.id.btn_tro_ve_lua_chon:
@@ -220,7 +222,7 @@ public class LimitFrament extends Fragment implements ItemAppAdapter.OnItemClick
         dialog.show();
     }
 
-    private void showDialogThietLapGioiHan1(final Drawable drawable, final String packageName) {
+    private void showDialogThietLapGioiHan1(final int position, final Drawable drawable, final String packageName) {
         final Dialog dialog = new Dialog(context);
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
         dialog.setContentView(R.layout.dialog_thiet_lap_gioi_han_1);
@@ -272,27 +274,6 @@ public class LimitFrament extends Fragment implements ItemAppAdapter.OnItemClick
                         isChosseSoLan = true;
                         isChosseThoiGian = false;
                         break;
-                    case R.id.btn_tang_so_lan:
-                        int a = Integer.parseInt(edtSoLanMo.getText().toString());
-                        a++;
-                        if (a > 99) {
-                            edtSoLanMo.setTextSize(18);
-                        }
-                        edtSoLanMo.setText(String.valueOf(a));
-                        break;
-                    case R.id.btn_giam_so_lan:
-                        int b = Integer.parseInt(edtSoLanMo.getText().toString());
-                        if (b > 0) {
-                            b--;
-                        }
-                        if (b > 99) {
-                            edtSoLanMo.setTextSize(18);
-                        }
-                        if (b <= 99) {
-                            edtSoLanMo.setTextSize(20);
-                        }
-                        edtSoLanMo.setText(String.valueOf(b));
-                        break;
                     case R.id.btn_chon_gio_so_lan_mo:
                         btnChonGioThoiGian.setChecked(false);
                         btnChonNgayThoiGian.setChecked(false);
@@ -339,53 +320,6 @@ public class LimitFrament extends Fragment implements ItemAppAdapter.OnItemClick
                         btnChonSoLan.setChecked(false);
                         isChosseThoiGian = true;
                         isChosseSoLan = false;
-                        break;
-                    case R.id.btn_tang_gio_thoi_gian:
-                        int c = Integer.parseInt(edtSoGioThoiGian.getText().toString());
-                        c++;
-                        if (c > 99) {
-                            edtSoGioThoiGian.setTextSize(13);
-                        }
-                        edtSoGioThoiGian.setText(String.valueOf(c));
-                        break;
-                    case R.id.btn_giam_gio_thoi_gian:
-                        int d = Integer.parseInt(edtSoGioThoiGian.getText().toString());
-                        if (d > 0) {
-                            d--;
-                        }
-                        if (d > 99) {
-                            edtSoGioThoiGian.setTextSize(13);
-                        }
-                        if (d <= 99) {
-                            edtSoGioThoiGian.setTextSize(16);
-                        }
-                        edtSoGioThoiGian.setText(String.valueOf(d));
-                        break;
-                    case R.id.btn_tang_phut_thoi_gian:
-                        int e = Integer.parseInt(edtSoPhutThoiGian.getText().toString());
-                        e++;
-                        edtSoPhutThoiGian.setText(String.valueOf(e));
-                        if (e == 60) {
-                            int p = Integer.parseInt(edtSoGioThoiGian.getText().toString());
-                            p++;
-                            e = 0;
-                            edtSoGioThoiGian.setText(String.valueOf(p));
-                            edtSoPhutThoiGian.setText(String.valueOf(e));
-                        }
-
-                        break;
-                    case R.id.btn_giam_phut_thoi_gian:
-                        int f = Integer.parseInt(edtSoPhutThoiGian.getText().toString());
-                        if (f == 0) {
-                            int p = Integer.parseInt(edtSoGioThoiGian.getText().toString());
-                            if (p > 0) {
-                                p--;
-                            }
-                            f = 59;
-                            edtSoGioThoiGian.setText(String.valueOf(p));
-                            edtSoPhutThoiGian.setText(String.valueOf(f));
-                        } else f--;
-                        edtSoPhutThoiGian.setText(String.valueOf(f));
                         break;
                     case R.id.btn_chon_gio_thoi_gian:
                         btnChonGioSoLan.setChecked(false);
@@ -449,8 +383,8 @@ public class LimitFrament extends Fragment implements ItemAppAdapter.OnItemClick
 
                                 } else {
 
-                                    showDialogThietLapGioiHan2(drawable, packageName);
-                                    dialog.dismiss();
+                                    showDialogThietLapGioiHan2(dialog, position, drawable, packageName);
+                                    dialog.hide();
                                     //Todo
                                 }
                             }
@@ -466,24 +400,24 @@ public class LimitFrament extends Fragment implements ItemAppAdapter.OnItemClick
                                         if (soThoiGianThietLap[0] >= 1) {
                                             showDialogLoi("Xin vui lòng kiểm tra lại thiết lập giới hạn!");
                                         } else {
-                                            showDialogThietLapGioiHan2(drawable, packageName);
-                                            dialog.dismiss();
+                                            showDialogThietLapGioiHan2(dialog, position, drawable, packageName);
+                                            dialog.hide();
                                         }
                                         break;
                                     case 0:
                                         if (soThoiGianThietLap[0] >= 24) {
                                             showDialogLoi("Xin vui lòng kiểm tra lại thiết lập giới hạn!");
                                         } else {
-                                            showDialogThietLapGioiHan2(drawable, packageName);
-                                            dialog.dismiss();
+                                            showDialogThietLapGioiHan2(dialog, position, drawable, packageName);
+                                            dialog.hide();
                                         }
                                         break;
                                     case 1:
                                         if ((soThoiGianThietLap[0] >= 168)) {
                                             showDialogLoi("Xin vui lòng kiểm tra lại thiết lập giới hạn!");
                                         } else {
-                                            showDialogThietLapGioiHan2(drawable, packageName);
-                                            dialog.dismiss();
+                                            showDialogThietLapGioiHan2(dialog, position, drawable, packageName);
+                                            dialog.hide();
                                         }
                                         break;
                                     default:
@@ -499,31 +433,133 @@ public class LimitFrament extends Fragment implements ItemAppAdapter.OnItemClick
                 }
             }
         };
+        View.OnTouchListener onTouchListener = new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+//                int tempCount=0;
+                switch (v.getId()) {
+                    case R.id.btn_tang_so_lan:
+                        tempCount++;
+                        if (tempCount % 11 == 0) {
+                            int tempOpen = Integer.parseInt(edtSoLanMo.getText().toString());
+                            if (tempOpen > 99) {
+                                edtSoLanMo.setTextSize(18);
+                            }
+                            edtSoLanMo.setText(String.valueOf(tempOpen + 1));
+                            tempCount = 0;
+                        }
+                        break;
+                    case R.id.btn_giam_so_lan:
+                        tempCount++;
+                        if (tempCount % 11 == 0) {
+                            int tempOpen = Integer.parseInt(edtSoLanMo.getText().toString());
+                            if (tempOpen > 0) {
+                                if (tempOpen <= 99) {
+                                    edtSoLanMo.setTextSize(20);
+                                }
+                                edtSoLanMo.setText(String.valueOf(tempOpen - 1));
+                            }
+                            tempCount = 0;
+                        }
+                        break;
+                    case R.id.btn_tang_gio_thoi_gian:
+                        tempCount++;
+                        if (tempCount % 11 == 0) {
+                            int c = Integer.parseInt(edtSoGioThoiGian.getText().toString());
+                            c++;
+                            if (c > 99) {
+                                edtSoGioThoiGian.setTextSize(13);
+                            }
+                            edtSoGioThoiGian.setText(String.valueOf(c));
+                            tempCount = 0;
+                        }
+                        break;
+                    case R.id.btn_giam_gio_thoi_gian:
+                        tempCount++;
+                        if (tempCount % 11 == 0) {
+                            int d = Integer.parseInt(edtSoGioThoiGian.getText().toString());
+                            if (d > 0) {
+                                d--;
+                            }
+                            if (d > 99) {
+                                edtSoGioThoiGian.setTextSize(13);
+                            }
+                            if (d <= 99) {
+                                edtSoGioThoiGian.setTextSize(16);
+                            }
+                            edtSoGioThoiGian.setText(String.valueOf(d));
+                            tempCount = 0;
+                        }
+                        break;
+                    case R.id.btn_tang_phut_thoi_gian:
+                        tempCount++;
+                        if (tempCount % 11 == 0) {
+                            int e = Integer.parseInt(edtSoPhutThoiGian.getText().toString());
+                            e++;
+                            edtSoPhutThoiGian.setText(String.valueOf(e));
+                            if (e == 60) {
+                                int p = Integer.parseInt(edtSoGioThoiGian.getText().toString());
+                                p++;
+                                e = 0;
+                                edtSoGioThoiGian.setText(String.valueOf(p));
+                                edtSoPhutThoiGian.setText(String.valueOf(e));
+                            }
+                            tempCount = 0;
+                        }
+                        break;
+                    case R.id.btn_giam_phut_thoi_gian:
+                        tempCount++;
+                        if (tempCount % 11 == 0) {
+                            int f = Integer.parseInt(edtSoPhutThoiGian.getText().toString());
+                            if (f == 0) {
+                                int p = Integer.parseInt(edtSoGioThoiGian.getText().toString());
+                                if (p > 0) {
+                                    p--;
+                                }
+                                f = 59;
+                                edtSoGioThoiGian.setText(String.valueOf(p));
+                                edtSoPhutThoiGian.setText(String.valueOf(f));
+                            } else f--;
+                            edtSoPhutThoiGian.setText(String.valueOf(f));
+                            tempCount = 0;
+                        }
+                        break;
+                    default:
+                        break;
+                }
+                return false;
+            }
+        };
+
         btnChonSoLan.setOnClickListener(onClickListener);
         btnTangSoLan.setOnClickListener(onClickListener);
+        btnTangSoLan.setOnTouchListener(onTouchListener);
         btnGiamSoLan.setOnClickListener(onClickListener);
+        btnGiamSoLan.setOnTouchListener(onTouchListener);
         btnChonGioSoLan.setOnClickListener(onClickListener);
         btnChonNgaySoLan.setOnClickListener(onClickListener);
         btnChonTuanSoLan.setOnClickListener(onClickListener);
 
         btnChonThoiGian.setOnClickListener(onClickListener);
         btnTangGioThoiGian.setOnClickListener(onClickListener);
+        btnTangGioThoiGian.setOnTouchListener(onTouchListener);
         btnGiamGioThoiGian.setOnClickListener(onClickListener);
+        btnGiamGioThoiGian.setOnTouchListener(onTouchListener);
         btnTangPhutThoiGian.setOnClickListener(onClickListener);
+        btnTangPhutThoiGian.setOnTouchListener(onTouchListener);
         btnGiamPhutThoiGian.setOnClickListener(onClickListener);
+        btnGiamPhutThoiGian.setOnTouchListener(onTouchListener);
         btnChonGioThoiGian.setOnClickListener(onClickListener);
         btnChonNgayThoiGian.setOnClickListener(onClickListener);
         btnChonTuanThoiGian.setOnClickListener(onClickListener);
 
         btnTroVe.setOnClickListener(onClickListener);
         btnTiep.setOnClickListener(onClickListener);
-
-
         dialog.show();
 
     }
 
-    private void showDialogThietLapGioiHan2(final Drawable drawable, final String packageName) {
+    private void showDialogThietLapGioiHan2(final Dialog dialog1, final int position, final Drawable drawable, final String packageName) {
         final Dialog dialog = new Dialog(context);
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
         dialog.setContentView(R.layout.dialog_thiet_lap_gioi_han_2);
@@ -559,7 +595,8 @@ public class LimitFrament extends Fragment implements ItemAppAdapter.OnItemClick
                         break;
                     case R.id.btn_tro_ve_thiet_lap_2:
                         dialog.dismiss();
-                        showDialogThietLapGioiHan1(drawable, packageName);
+                        dialog1.show();
+//                        showDialogThietLapGioiHan1(position, drawable, packageName);
                         break;
                     case R.id.btn_tao_thiet_lap_2:
                         if (flagLevel != 0) {
@@ -591,7 +628,7 @@ public class LimitFrament extends Fragment implements ItemAppAdapter.OnItemClick
                             }
                             int numberLimited = countDown;
 
-                            long timeEnd = timeStart;
+                            long timeEnd = 0;
                             switch (flagChonMocGioiHan) {
                                 case -1:
                                     objFinish = "giờ";
@@ -608,11 +645,11 @@ public class LimitFrament extends Fragment implements ItemAppAdapter.OnItemClick
                                 default:
                                     break;
                             }
-                            long timeLastShow=0;
+                            long timeLastShow = 0;
 
                             AppLimited appLimited = new AppLimited(packageName, typeLimit,
                                     numberIsOpen, countTime, objFinish, isLimit, level, numberLimited,
-                                    countDown, timeStart, timeEnd,timeLastShow);
+                                    countDown, timeStart, timeEnd, timeLastShow);
                             Log.d("MyService", "countdown add: " + appLimited.getCountDown());
                             long a = database.addToLimitedDatabase(appLimited);
 
@@ -623,8 +660,9 @@ public class LimitFrament extends Fragment implements ItemAppAdapter.OnItemClick
                                 showDialogLoi("Xảy ra lỗi trong quá trình thêm thiết lập giới hạn.\n" +
                                         "Xin vui lòng thử lại sau");
                             } else {
+                                String appName = apps.get(position).getTxtAppName();
                                 String s = "";
-                                s = "Bạn đã tạo thành công giới hạn cho Ứng dụng:\n\nVới ";
+                                s = "Bạn đã tạo thành công giới hạn cho Ứng dụng: " + appName + "\n\nVới ";
                                 if (isChosseSoLan) {
                                     int n = soLanThietLap;
                                     switch (flagChonMocGioiHan) {
@@ -687,9 +725,14 @@ public class LimitFrament extends Fragment implements ItemAppAdapter.OnItemClick
         btnChonLevelCuongQuyet.setOnClickListener(onClickListener);
         btnTroVe.setOnClickListener(onClickListener);
         btnTao.setOnClickListener(onClickListener);
-
+        dialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
+            @Override
+            public void onCancel(DialogInterface dialog) {
+                dialog.dismiss();
+                dialog1.show();
+            }
+        });
         dialog.show();
-
     }
 
     private void showDialogLoi(String s) {

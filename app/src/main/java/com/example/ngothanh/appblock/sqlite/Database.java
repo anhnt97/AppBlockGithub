@@ -5,7 +5,6 @@ import android.content.Context;
 import android.content.res.AssetManager;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -96,7 +95,7 @@ public class Database {
 
     public int getBackgroundId() {
         int index = random.nextInt(30);
-        Log.d("loi", "backgroundId: "+ index);
+//        Log.d("loi", "backgroundId: " + index);
         return arrayBackgroundId[index];
     }
 
@@ -145,7 +144,7 @@ public class Database {
         openDb();
         String sql = "SELECT * FROM " + TABLE_LIMITED;
         Cursor cursor = dbValue.rawQuery(sql, null);
-        if (cursor == null ) {
+        if (cursor == null) {
             return appLimiteds;
         }
         if (cursor.getCount() == 0) {
@@ -203,7 +202,7 @@ public class Database {
         return result;
     }
 
-    public long updateToLimitedDatabase(AppLimited appLimited) {
+    public void updateToLimitedDatabase(AppLimited appLimited) {
         openDb();
         ContentValues values = new ContentValues();
         values.put(COLUMN_LIMITED_PACKAGE_NAME, appLimited.getPackageName());
@@ -220,9 +219,8 @@ public class Database {
         values.put(COLUMN_TIME_START, appLimited.getTimeStart());
         values.put(COLUMN_TIME_END, appLimited.getTimeEnd());
         values.put(COLUMN_TIME_LAST_SHOW, appLimited.getTimeLastShow());
-        long result = dbValue.update(TABLE_LIMITED, values, COLUMN_LIMITED_PACKAGE_NAME + " = ? ", new String[]{appLimited.getPackageName()});
+        dbValue.update(TABLE_LIMITED, values, COLUMN_LIMITED_PACKAGE_NAME + " = ? ", new String[]{appLimited.getPackageName()});
         closeDb();
-        return result;
     }
 
     public void deleteLimitedDatabase(String packagename) {

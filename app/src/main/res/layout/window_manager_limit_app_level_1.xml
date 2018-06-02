@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
     android:id="@+id/layout_wd_manager_1"
-    >
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
 
-    <RelativeLayout
-        android:id="@+id/rlt_layout_about"
+    <LinearLayout
+        android:id="@+id/lin_layout_about"
         android:layout_width="match_parent"
         android:layout_height="45dp"
+        android:orientation="horizontal"
         android:layout_marginLeft="16dp"
         android:layout_marginRight="16dp"
         android:layout_marginTop="12dp"
@@ -17,12 +17,10 @@
         <ImageView
             android:id="@+id/img_icon_app_in_wdmanager_1"
             android:layout_width="35dp"
-            android:layout_height="30dp"
-            android:layout_alignParentStart="true"
-            android:layout_alignTop="@+id/textView2"
-            android:layout_marginLeft="4dp"
-            android:layout_marginTop="5dp"
-            />
+            android:layout_height="35dp"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="12dp"
+            android:layout_marginTop="5dp" />
 
         <TextView
             android:id="@+id/textView2"
@@ -31,18 +29,17 @@
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
             android:layout_gravity="center"
-            android:layout_marginStart="16dp"
-            android:layout_toEndOf="@+id/img_icon_app_in_wdmanager_1"
+            android:layout_marginLeft="8dp"
             android:text="Thông báo giới hạn"
             android:textColor="#163491"
             android:textSize="22sp" />
-    </RelativeLayout>
+    </LinearLayout>
 
     <RelativeLayout
         android:id="@+id/rlt_layout_messenger_in_wdmanager_2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/rlt_layout_about"
+        android:layout_below="@+id/lin_layout_about"
         android:layout_marginLeft="16dp"
         android:layout_marginRight="16dp"
         android:layout_marginTop="20dp"
@@ -53,7 +50,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginBottom="8dp"
-            android:layout_marginLeft="8dp"
+            android:layout_marginLeft="12dp"
             android:layout_marginRight="8dp"
             android:layout_marginTop="8dp"
             android:text="Bạn đã sử dụng ứng dụng vượt quá thiết lập giới hạn. Bạn có muỗn tiếp tục sử dụng ứng dụng?"
@@ -65,8 +62,8 @@
     <RelativeLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_above="@id/rlt_layout_btn_wdmanager_1"
-        android:layout_marginBottom="16dp"
+        android:layout_above="@id/rlt_layout_btn_wdmanage_1"
+        android:layout_marginBottom="12dp"
         android:layout_marginLeft="16dp"
         android:layout_marginRight="16dp"
         android:background="#87e8efef"
@@ -106,7 +103,7 @@
 
 
     <LinearLayout
-        android:id="@+id/rlt_layout_btn_wdmanager_1"
+        android:id="@+id/rlt_layout_btn_wdmanage_1"
         android:layout_width="match_parent"
         android:layout_height="30dp"
         android:layout_alignParentBottom="true"
